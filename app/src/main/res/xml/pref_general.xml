@@ -1,0 +1,24 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+<SwitchPreference
+android:defaultValue="true"
+android:key="shownotification"
+android:summary="通知栏常驻通知"
+android:title="显示通知" />
+<SwitchPreference
+android:defaultValue="false"
+android:key="log"
+android:summary="将会产生大量调试记录"
+android:title="记录日志" />
+
+<EditTextPreference
+android:defaultValue="0"
+android:inputType="number"
+android:key="check"
+android:maxLines="1"
+android:singleLine="true"
+android:summary="减去不可用流量（M）"
+android:title="校正(M)" />
+
+    </PreferenceScreen>
