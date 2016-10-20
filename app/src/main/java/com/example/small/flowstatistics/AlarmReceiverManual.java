@@ -84,7 +84,6 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
         editor.commit();
 
         Log.d("qiang", "定时更新广播处理完毕manual");
-
     }
 
     @Override

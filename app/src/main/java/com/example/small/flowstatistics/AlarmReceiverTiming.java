@@ -43,20 +43,23 @@ public class AlarmReceiverTiming extends BroadcastReceiver implements Notificati
                 SharedPreferences pref = context.getSharedPreferences("data", Context.MODE_PRIVATE);
 
                 //boolean isreboot = pref.getBoolean("isreboot", false); //1
-                //boolean iscurday = pref.getBoolean("iscurday", true);//2
+                //boolean iszero = pref.getBoolean("iszero", true);//2
                 long cur_boot_mobiletx = TrafficStats.getMobileTxBytes();
                 long cur_boot_mobilerx = TrafficStats.getMobileRxBytes();
                 long thisbootflow = cur_boot_mobilerx + cur_boot_mobiletx;//3
                 //long curdayflow = pref.getLong("curdayflow", 0);//4
-                //long onedaylastbootflow = pref.getLong("onedaylastbootflow", 0);//5
-                //long onebootlastdayflow = pref.getLong("onebootlastdayflow", 0);//6
-
-
+                long onedaylastbootflow = pref.getLong("onedaylastbootflow", 0);//5
+                long onebootlastdayflow = pref.getLong("onebootlastdayflow", 0);//6
                 CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();
                 long curdayflow = calculateTodayFlow.calculate(context);
 
+                onebootlastdayflow = curdayflow + onedaylastbootflow;
                 editor.putLong("thisbootflow", thisbootflow);
                 editor.putLong("curdayflow", curdayflow);
+                editor.putBoolean("isreboot",true);
+                editor.putBoolean("iszero", false);
+                editor.putLong("onedaylastbootflow", 0);
+                editor.putLong("onebootlastdayflow", onebootlastdayflow);
                 editor.commit();
 
                 show_notifiction(context, curdayflow);

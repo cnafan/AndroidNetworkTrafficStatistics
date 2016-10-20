@@ -19,7 +19,6 @@ import static android.content.Context.NOTIFICATION_SERVICE;
  */
 
 public class BootReceiver extends BroadcastReceiver implements Notifications.Interaction_notification {
-
     public NotificationManager notificationManager;
 
     @Override
@@ -28,7 +27,6 @@ public class BootReceiver extends BroadcastReceiver implements Notifications.Int
             intent = new Intent(context, AlarmManualStart.class);
             //开启关闭Service1
             context.startService(intent);
-
             SharedPreferences.Editor editor = context.getSharedPreferences("data", MODE_PRIVATE).edit();
             SharedPreferences pref = context.getSharedPreferences("data", MODE_PRIVATE);
             long curdayflow = pref.getLong("curdayflow", 0);//4

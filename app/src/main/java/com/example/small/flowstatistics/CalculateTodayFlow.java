@@ -6,15 +6,12 @@ import android.net.TrafficStats;
 import android.util.Log;
 
 import static android.content.Context.MODE_PRIVATE;
-
 /**
  * Created by small on 2016/9/30.
  */
 
 class CalculateTodayFlow {
     long calculate(Context context) {
-
-
         SharedPreferences.Editor editor = context.getSharedPreferences("data", MODE_PRIVATE).edit();
         SharedPreferences pref = context.getSharedPreferences("data", MODE_PRIVATE);
 
@@ -30,19 +27,18 @@ class CalculateTodayFlow {
         long onedaylastbootflow = pref.getLong("onedaylastbootflow", 0);//5
         long onebootlastdayflow = pref.getLong("onebootlastdayflow", 0);//6
 
-
-        if(iszero&&!isreboot){
-            result=thisbootflow-onebootlastdayflow;
+        if (!isreboot) {
+            result = thisbootflow - onebootlastdayflow;
+        } else {
+            if (iszero) {
+                result = thisbootflow + onedaylastbootflow - onedaylastbootflow;
+            } else {
+                result = thisbootflow + onedaylastbootflow;
+            }
         }
-        else
-        {
-            result=thisbootflow+onedaylastbootflow;
-        }
-
         editor.putLong("curdayflow", result);
         Log.d("qiang", "curdayflow:" + result);
         editor.commit();
         return result;
     }
-
 }

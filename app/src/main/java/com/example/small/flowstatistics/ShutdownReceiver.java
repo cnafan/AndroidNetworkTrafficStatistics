@@ -4,8 +4,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.TrafficStats;
 import android.util.Log;
+
+import java.util.Objects;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -22,24 +26,33 @@ public class ShutdownReceiver extends BroadcastReceiver {
         long result;//1 当日使用流量
         boolean isreboot = pref.getBoolean("isreboot", false); //2 重启过
         boolean iszero = pref.getBoolean("iszero", false);//3 过0点
-        long cur_boot_mobiletx = TrafficStats.getMobileTxBytes();
-        long cur_boot_mobilerx = TrafficStats.getMobileRxBytes();
-        long thisbootflow = cur_boot_mobilerx + cur_boot_mobiletx;//4
-        Log.d("qiang", "thisbootflow:" + thisbootflow);
+        long thisbootflow = pref.getLong("thisbootflow", 0);  //4
+        //Log.d("qiang", "thisbootflow:" + thisbootflow);
         long onedaylastbootflow = pref.getLong("onedaylastbootflow", 0);//5
         long onebootlastdayflow = pref.getLong("onebootlastdayflow", 0);//6
-
         long curdayflow = pref.getLong("curdayflow", 0);
 
-        editor.putBoolean("isreboot", true);
-        if (iszero) {
-            onedaylastbootflow = thisbootflow - onebootlastdayflow;
-        } else {
-            onedaylastbootflow = onedaylastbootflow+ thisbootflow;
+        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mobileInfo = manager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        NetworkInfo wifiInfo = manager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        NetworkInfo activeInfo = manager.getActiveNetworkInfo();
+        if (activeInfo == null) {
+            Log.d("qiang", "网络没有连接");
+            return;
         }
-        editor.putLong("onedaylastbootflow", onedaylastbootflow);
-        editor.putBoolean("iszero", false);
+        if (activeInfo.isConnected()) {
+            if (Objects.equals(activeInfo.getTypeName(), "MOBILE")) {
+                long cur_boot_mobiletx = TrafficStats.getMobileTxBytes();
+                long cur_boot_mobilerx = TrafficStats.getMobileRxBytes();
+                thisbootflow = cur_boot_mobilerx + cur_boot_mobiletx;
+            }
+        }
 
+        onedaylastbootflow = thisbootflow - onebootlastdayflow;
+        editor.putLong("onedaylastbootflow", onedaylastbootflow);
+        editor.putLong("onebootlastdayflow", 0);
+        editor.putBoolean("isreboot", true);
+        editor.putBoolean("iszero", false);
         editor.commit();
         Log.d("qiang", "shutdown");
     }
