@@ -42,7 +42,7 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
         sendmessage.Sendmessages(context);
         //静音
         sendmessage.silent(context);
-        Log.d("qiang", "定时短信发送成功");
+        Log.d("qiang", "每日短信发送成功");
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("android.provider.Telephony.SMS_RECEIVED");
@@ -60,7 +60,17 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
         NetworkInfo mobileInfo = manager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
         NetworkInfo wifiInfo = manager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         NetworkInfo activeInfo = manager.getActiveNetworkInfo();
-        long thisbootflow=pref.getLong("thisbootflow", 0);;
+
+
+        //long result;//1 当日使用流量
+        //boolean isreboot = pref.getBoolean("isreboot", false); //2 重启过
+        // boolean iszero = pref.getBoolean("iszero", false);//3 过0点
+        long thisbootflow = pref.getLong("thisbootflow", 0);//4
+        //long curdayflow=pref.getLong("curdayflow",0);
+        //Log.d("qiang", "thisbootflow:" + thisbootflow);
+        long onedaylastbootflow = pref.getLong("onedaylastbootflow", 0);//5
+        long onebootlastdayflow = pref.getLong("onebootlastdayflow", 0);//6
+
         if (activeInfo.isConnected()) {
             if (Objects.equals(activeInfo.getTypeName(), "MOBILE")) {
                 long cur_boot_mobiletx = TrafficStats.getMobileTxBytes();
@@ -68,22 +78,14 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
                 thisbootflow = cur_boot_mobilerx + cur_boot_mobiletx;//4
             }
         }
-        long result;//1 当日使用流量
-        boolean isreboot = pref.getBoolean("isreboot", false); //2 重启过
-        boolean iszero = pref.getBoolean("iszero", false);//3 过0点
-
-        Log.d("qiang", "thisbootflow:" + thisbootflow);
-        long onedaylastbootflow = pref.getLong("onedaylastbootflow", 0);//5
-        long onebootlastdayflow = pref.getLong("onebootlastdayflow", 0);//6
-        long curdayflow=pref.getLong("curdayflow",0);
-
-        editor.putLong("onedaylastbootflow",0);
-        editor.putLong("onebootlastdayflow", thisbootflow);
-        editor.putBoolean("iszero", true);
-        editor.putBoolean("isreboot", false);
+        //editor.putBoolean("iszero", true);
+        //editor.putBoolean("isreboot", false);
+        onebootlastdayflow = thisbootflow + onedaylastbootflow;
+        editor.putLong("onebootlastdayflow", onebootlastdayflow);
+        //editor.putLong("onedaylastbootflow", 0);
         editor.commit();
 
-        Log.d("qiang", "定时更新广播处理完毕manual");
+        Log.d("qiang", "每日更新广播处理完毕manual");
     }
 
     @Override
@@ -144,6 +146,7 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
             Toast.makeText(context, "查询失败-.-", Toast.LENGTH_LONG).show();
         }
     }
+
     String show_change(long data) {
 
         DecimalFormat df = new DecimalFormat("#.##");
@@ -177,6 +180,7 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
         }
         */
     }
+
     public class Sendmessage {
         void Sendmessages(Context context) {
             SmsManager manager = SmsManager.getDefault();

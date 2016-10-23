@@ -42,31 +42,27 @@ public class AlarmReceiverTiming extends BroadcastReceiver implements Notificati
                 SharedPreferences.Editor editor = context.getSharedPreferences("data", Context.MODE_PRIVATE).edit();
                 SharedPreferences pref = context.getSharedPreferences("data", Context.MODE_PRIVATE);
 
-                //boolean isreboot = pref.getBoolean("isreboot", false); //1
-                //boolean iszero = pref.getBoolean("iszero", true);//2
+                //boolean isreboot = pref.getBoolean("isreboot", false); //2
+                //boolean iszero = pref.getBoolean("iszero", true);//3
                 long cur_boot_mobiletx = TrafficStats.getMobileTxBytes();
                 long cur_boot_mobilerx = TrafficStats.getMobileRxBytes();
-                long thisbootflow = cur_boot_mobilerx + cur_boot_mobiletx;//3
-                //long curdayflow = pref.getLong("curdayflow", 0);//4
-                long onedaylastbootflow = pref.getLong("onedaylastbootflow", 0);//5
-                long onebootlastdayflow = pref.getLong("onebootlastdayflow", 0);//6
+                long thisbootflow = cur_boot_mobilerx + cur_boot_mobiletx;//4
+                //long curdayflow = pref.getLong("curdayflow", 0);
+                //long onedaylastbootflow = pref.getLong("onedaylastbootflow", 0);//5
+                //long onebootlastdayflow = pref.getLong("onebootlastdayflow", 0);//6
+
                 CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();
                 long curdayflow = calculateTodayFlow.calculate(context);
 
-                onebootlastdayflow = curdayflow + onedaylastbootflow;
                 editor.putLong("thisbootflow", thisbootflow);
                 editor.putLong("curdayflow", curdayflow);
-                editor.putBoolean("isreboot",true);
-                editor.putBoolean("iszero", false);
-                editor.putLong("onedaylastbootflow", 0);
-                editor.putLong("onebootlastdayflow", onebootlastdayflow);
                 editor.commit();
 
                 show_notifiction(context, curdayflow);
                 context.startService(new Intent(context, AlarmTimingStart.class));
             }
 //            Toast.makeText(context, "mobile:" + mobileInfo.isConnected() + "\n" + "wifi:" + wifiInfo.isConnected()      + "\n" + "active:" + activeInfo.getTypeName(), Toast.LENGTH_SHORT).show();
-            Log.d("qiang", "mobile:" + mobileInfo.isConnected() + ",wifi:" + wifiInfo.isConnected() + ",active:" + activeInfo.getTypeName());
+            //Log.d("qiang", "mobile:" + mobileInfo.isConnected() + ",wifi:" + wifiInfo.isConnected() + ",active:" + activeInfo.getTypeName());
         } else {
             Log.d("qiang", "网络没有连接,所以终止定时广播");
         }
@@ -79,8 +75,6 @@ public class AlarmReceiverTiming extends BroadcastReceiver implements Notificati
         String all_liuliang = pref.getString("all_liuliang", "");
         notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         String notification_string;
-
-        //long today = calculate_today(this);
 
         if (Objects.equals(remain_liuliang, "") | Objects.equals(all_liuliang, "")) {
             notification_string = "无流量数据，请启动应用查询";

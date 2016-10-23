@@ -70,8 +70,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SharedPreferences pref = getSharedPreferences("data", MODE_PRIVATE);
         boolean isfirstrun = pref.getBoolean("isfirstrun", true);
         if (isfirstrun) {
-            editor.putBoolean("isreboot", false);//1
-            editor.putBoolean("iszero", false);//2
+            //editor.putBoolean("isreboot", false);//1
+            //editor.putBoolean("iszero", false);//2
             editor.putLong("thisbootflow", 0);//3
             editor.putLong("curdayflow", 0);//4
             editor.putLong("onedaylastbootflow", 0);//一日内上次开机使用的流量 5
