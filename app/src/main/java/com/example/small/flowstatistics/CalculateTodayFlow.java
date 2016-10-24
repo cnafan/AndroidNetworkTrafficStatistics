@@ -28,7 +28,7 @@ class CalculateTodayFlow {
         long onedaylastbootflow = pref.getLong("onedaylastbootflow", 0);//5
         long onebootlastdayflow = pref.getLong("onebootlastdayflow", 0);//6
 
-        result = thisbootflow + onedaylastbootflow - onedaylastbootflow;
+        result = thisbootflow + onedaylastbootflow - onebootlastdayflow;
 
         editor.putLong("curdayflow", result);
         Log.d("qiang", "curdayflow:" + result);
