@@ -162,23 +162,15 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
 
     public void recovery(Context context) {
         //Log.d("qiang", "volumn:" + volumn);
-        audio = (AudioManager) context.getSystemService(AUDIO_SERVICE);
-        audio.setRingerMode(mode);
-        audio.setStreamVolume(mode, volumn, 0);
-        /*
-        if (mode == RINGER_MODE_SILENT) {
-            audio.setRingerMode(RINGER_MODE_SILENT);
-            //audio.setStreamVolume(RINGER_MODE_SILENT, volumn, 0);
-            audio.setRingerMode(RINGER_MODE_VIBRATE);
-            audio.setStreamVolume(RINGER_MODE_VIBRATE, volumn, 0);
-        } else if (volumn == RINGER_MODE_VIBRATE) {
-            audio.setRingerMode(RINGER_MODE_VIBRATE);
-            audio.setStreamVolume(RINGER_MODE_VIBRATE, volumn, 0);
+        if (Build.VERSION.SDK_INT >= 24) {
+
+            audio = (AudioManager)context.getSystemService(AUDIO_SERVICE);
         } else {
-            audio.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-            audio.setStreamVolume(AudioManager.RINGER_MODE_NORMAL, volumn, 0);
+            audio = (AudioManager) context.getSystemService(AUDIO_SERVICE);
+            audio.setRingerMode(mode);
+            audio.setStreamVolume(mode, volumn, 0);
         }
-        */
+
     }
 
     public class Sendmessage {
@@ -189,15 +181,20 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
 
         void silent(Context context) {
             //静音--------
-            audio = (AudioManager) context.getSystemService(AUDIO_SERVICE);
-            mode = audio.getRingerMode();
-            int volumn = audio.getStreamVolume(STREAM_RING);
-            audio.setStreamVolume(STREAM_RING, 0, 0);
-            audio.setRingerMode(RINGER_MODE_SILENT);
-            //audio.setRingerMode(RINGER_MODE_SILENT);
+            if (Build.VERSION.SDK_INT >= 24) {
+                audio = (AudioManager) context.getSystemService(AUDIO_SERVICE);
+                audio.adjustVolume(AudioManager.ADJUST_LOWER, 0);
+            } else {
+                audio = (AudioManager)context.getSystemService(AUDIO_SERVICE);
+                mode = audio.getRingerMode();
+                volumn = audio.getStreamVolume(STREAM_RING);
+                audio.setStreamVolume(STREAM_RING, 0, 0);
+                audio.setRingerMode(RINGER_MODE_SILENT);
+                //audio.setRingerMode(RINGER_MODE_SILENT);
 
-            Log.d("qiang", "old_mode:" + volumn);
-            Log.d("qiang", "old_volumn:" + volumn);
+                Log.d("qiang", "old_mode:" + volumn);
+                Log.d("qiang", "old_volumn:" + volumn);
+            }
         }
     }
 

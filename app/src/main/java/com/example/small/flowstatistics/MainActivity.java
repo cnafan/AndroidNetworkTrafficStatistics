@@ -5,7 +5,9 @@ import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -13,8 +15,10 @@ import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -78,6 +82,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             editor.putLong("onebootlastdayflow", 0);//一次开机前一天使用的流量 6
             editor.putBoolean("isfirstrun", false);
             editor.commit();
+
+            if (isMIUI()) {
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+                alertDialog.setMessage("检测到您的手机为MIUI系统，软件正常运行需要申请权限，现跳转至权限管理界面");
+                alertDialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        gotoPermissionSettings(MainActivity.this);
+                    }
+                });
+            }
         }
 
         if (!isMyServiceRunning()) {
@@ -145,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 final AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
                 alertDialog.setTitle("帮助");
                 String helpmessage = "1.点击查询按钮是请务必在开启数据且关闭wifi后。" +
-                        "\n2.使用校正功能后请点击查询按钮导入设置。";
+                        "\n2.使用校正功能后请点击查询按钮导入设置。" + "\n3.每日自动校正将于次日早上6点开始。";
                 alertDialog.setMessage(helpmessage);
                 alertDialog.setPositiveButton("OK", null);
                 alertDialog.show();
@@ -280,6 +295,64 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    /* 检查手机是否是miui
+    *
+            * @ref http://dev.xiaomi.com/doc/p=254/index.html
+            * @return
+            */
+
+    /**
+     * 检查手机是否是miui
+     *
+     * @return
+     * @ref http://dev.xiaomi.com/doc/p=254/index.html
+     */
+    public static boolean isMIUI() {
+        String device = Build.MANUFACTURER;
+        System.out.println("Build.MANUFACTURER = " + device);
+        if (device.equals("Xiaomi")) {
+            System.out.println("this is a xiaomi device");
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 跳转到应用权限设置页面 http://www.tuicool.com/articles/jUby6rA
+     *
+     * @param context 传入app 或者 activity
+     *                context，通过context获取应用packegename，之后通过packegename跳转制定应用
+     * @return 是否是miui
+     */
+    public static boolean gotoPermissionSettings(Context context) {
+        boolean mark = isMIUI();
+
+        if (mark) {
+
+            // 只兼容miui v5/v6 的应用权限设置页面，否则的话跳转应用设置页面（权限设置上一级页面）
+            try {
+                Intent localIntent = new Intent(
+                        "miui.intent.action.APP_PERM_EDITOR");
+                localIntent
+                        .setClassName("com.miui.securitycenter",
+                                "com.miui.permcenter.permissions.AppPermissionsEditorActivity");
+                localIntent.putExtra("extra_pkgname", context.getPackageName());
+                context.startActivity(localIntent);
+
+            } catch (ActivityNotFoundException e) {
+                Intent intent = new Intent(
+                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                Uri uri = Uri.fromParts("package", context.getPackageName(),
+                        null);
+                intent.setData(uri);
+                context.startActivity(intent);
+            }
+        }
+
+        return mark;
+    }
+
     public boolean isMyServiceRunning() {
         ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
@@ -292,9 +365,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void recovery() {
         //Log.d("qiang", "volumn:" + volumn);
-        audio = (AudioManager) getSystemService(AUDIO_SERVICE);
-        audio.setRingerMode(mode);
-        audio.setStreamVolume(mode, volumn, 0);
+        if (Build.VERSION.SDK_INT >= 24) {
+
+            audio = (AudioManager) getSystemService(AUDIO_SERVICE);
+        } else {
+            audio = (AudioManager) getSystemService(AUDIO_SERVICE);
+            audio.setRingerMode(mode);
+            audio.setStreamVolume(mode, volumn, 0);
+        }
 
     }
 
@@ -307,15 +385,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         void silent() {
             //静音--------
-            audio = (AudioManager) getSystemService(AUDIO_SERVICE);
-            mode = audio.getRingerMode();
-            volumn = audio.getStreamVolume(STREAM_RING);
-            audio.setStreamVolume(STREAM_RING, 0, 0);
-            audio.setRingerMode(RINGER_MODE_SILENT);
-            //audio.setRingerMode(RINGER_MODE_SILENT);
+            if (Build.VERSION.SDK_INT >= 24) {
+                audio = (AudioManager) getSystemService(AUDIO_SERVICE);
+                audio.adjustVolume(AudioManager.ADJUST_LOWER, 0);
+            } else {
+                audio = (AudioManager) getSystemService(AUDIO_SERVICE);
+                mode = audio.getRingerMode();
+                volumn = audio.getStreamVolume(STREAM_RING);
+                audio.setStreamVolume(STREAM_RING, 0, 0);
+                audio.setRingerMode(RINGER_MODE_SILENT);
+                //audio.setRingerMode(RINGER_MODE_SILENT);
 
-            Log.d("qiang", "old_mode:" + volumn);
-            Log.d("qiang", "old_volumn:" + volumn);
+                Log.d("qiang", "old_mode:" + volumn);
+                Log.d("qiang", "old_volumn:" + volumn);
+            }
         }
     }
 
