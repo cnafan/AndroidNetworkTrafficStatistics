@@ -16,7 +16,6 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import java.text.DecimalFormat;
 import java.util.Objects;
 
 import static android.content.Context.AUDIO_SERVICE;
@@ -24,6 +23,7 @@ import static android.content.Context.MODE_PRIVATE;
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static android.media.AudioManager.RINGER_MODE_SILENT;
 import static android.media.AudioManager.STREAM_RING;
+import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
 /**
  * Created by small on 2016/9/30.
@@ -38,36 +38,41 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Sendmessage sendmessage = new Sendmessage();//发送短信
-        sendmessage.Sendmessages(context);
-        //静音
-        sendmessage.silent(context);
-        Log.d("qiang", "每日短信发送成功");
+        SharedPreferences pref_default = getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = context.getSharedPreferences("data", Context.MODE_PRIVATE).edit();
+        SharedPreferences pref = context.getSharedPreferences("data", MODE_PRIVATE);
+        if (pref_default.getBoolean("AutomaticCheck", false)) {
+            Sendmessage sendmessage = new Sendmessage();//发送短信
+            sendmessage.Sendmessages(context);
+            //静音
+            sendmessage.silent(context);
+            Log.d("qiang", "每日短信发送成功");
 
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("android.provider.Telephony.SMS_RECEIVED");
-        SMSBroadcastReceiver dianLiangBR = new SMSBroadcastReceiver();
-        context.getApplicationContext().registerReceiver(dianLiangBR, intentFilter);
-        dianLiangBR.setInteractionListener(this);
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction("android.provider.Telephony.SMS_RECEIVED");
+            SMSBroadcastReceiver dianLiangBR = new SMSBroadcastReceiver();
+            context.getApplicationContext().registerReceiver(dianLiangBR, intentFilter);
+            dianLiangBR.setInteractionListener(this);
+        }
+
+        CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();
+        long todayflow = calculateTodayFlow.calculate(context);
+        long curmonthflow=pref.getLong("curmonthflow",0);
+        curmonthflow= curmonthflow+todayflow;
+        editor.putLong("curmonthflow",curmonthflow);
 
         //启动longRunningService
         Intent i = new Intent(context, AlarmManualStart.class);
         context.startService(i);
 
-        SharedPreferences.Editor editor = context.getSharedPreferences("data", Context.MODE_PRIVATE).edit();
-        SharedPreferences pref = context.getSharedPreferences("data", Context.MODE_PRIVATE);
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mobileInfo = manager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
         NetworkInfo wifiInfo = manager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         NetworkInfo activeInfo = manager.getActiveNetworkInfo();
 
-
         //long result;//1 当日使用流量
-        //boolean isreboot = pref.getBoolean("isreboot", false); //2 重启过
-        // boolean iszero = pref.getBoolean("iszero", false);//3 过0点
         long thisbootflow = pref.getLong("thisbootflow", 0);//4
         //long curdayflow=pref.getLong("curdayflow",0);
-        //Log.d("qiang", "thisbootflow:" + thisbootflow);
         long onedaylastbootflow = pref.getLong("onedaylastbootflow", 0);//5
         long onebootlastdayflow = pref.getLong("onebootlastdayflow", 0);//6
 
@@ -78,8 +83,6 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
                 thisbootflow = cur_boot_mobilerx + cur_boot_mobiletx;//4
             }
         }
-        //editor.putBoolean("iszero", true);
-        //editor.putBoolean("isreboot", false);
         onebootlastdayflow = thisbootflow + onedaylastbootflow;
         editor.putLong("onebootlastdayflow", onebootlastdayflow);
         //editor.putLong("onedaylastbootflow", 0);
@@ -90,18 +93,22 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
 
     @Override
     public void show_notifiction(Context context, long curdayflow) {
+
+        SharedPreferences pref_default = getDefaultSharedPreferences(context);
+        if (!pref_default.getBoolean("ShowNotification",true)){
+            return;
+        }
+
         SharedPreferences pref = context.getSharedPreferences("data", MODE_PRIVATE);
-        String remain_liuliang = pref.getString("remain_liuliang", "");
-        String all_liuliang = pref.getString("all_liuliang", "");
+        long remain_liuliang = pref.getLong("remain_liuliang", 0);
+        long all_liuliang = pref.getLong("all_liuliang", 0);
         notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         String notification_string;
-
-        //long today = calculate_today(this);
 
         if (Objects.equals(remain_liuliang, "") | Objects.equals(all_liuliang, "")) {
             notification_string = "无流量数据，请启动应用查询";
         } else {
-            notification_string = "本月流量还剩 " + remain_liuliang + " 今日已用" + show_change(curdayflow);
+            notification_string = "本月流量还剩 " + new Formatdata().longtostring(remain_liuliang) + " 今日已用" + new Formatdata().longtostring(curdayflow);
         }
         Notification.Builder builder = new Notification.Builder(context);
         builder.setSmallIcon(R.mipmap.ic_album_black_24dp)
@@ -118,8 +125,7 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
 
     @Override
     public void setTexts(Context context, String content, String content1) {
-//delay();
-
+    //delay();
         try {
             //Log.d("qiang", "delay");
             Thread.currentThread();
@@ -129,14 +135,11 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
         }
 
         recovery(context);
-
         if (content != null && content1 != null) {
             SharedPreferences.Editor editor = context.getSharedPreferences("data", MODE_PRIVATE).edit();
-
-            editor.putString("remain_liuliang", content);
-            editor.putString("all_liuliang", content1);
+            editor.putLong("remain_liuliang", new Formatdata().GetNumFromString(content));
+            editor.putLong("all_liuliang", new Formatdata().GetNumFromString(content1));
             editor.commit();
-
 
             CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();
             long todayflow = calculateTodayFlow.calculate(context);
@@ -147,30 +150,15 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
         }
     }
 
-    String show_change(long data) {
-
-        DecimalFormat df = new DecimalFormat("#.##");
-        double bytes = data / 1024.0;
-        if (bytes > 1048576.0 && bytes / 1048576.0 > 0) {
-            return df.format(bytes / 1048576.0) + "G";
-        } else if (bytes > 1024.0 && bytes / 1024.0 > 0) {
-            return df.format(bytes / 1024.0) + "M";
-        } else {
-            return df.format(bytes) + "k";
-        }
-    }
-
     public void recovery(Context context) {
         //Log.d("qiang", "volumn:" + volumn);
         if (Build.VERSION.SDK_INT >= 24) {
-
-            audio = (AudioManager)context.getSystemService(AUDIO_SERVICE);
+            audio = (AudioManager) context.getSystemService(AUDIO_SERVICE);
         } else {
             audio = (AudioManager) context.getSystemService(AUDIO_SERVICE);
             audio.setRingerMode(mode);
             audio.setStreamVolume(mode, volumn, 0);
         }
-
     }
 
     public class Sendmessage {
@@ -185,7 +173,7 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
                 audio = (AudioManager) context.getSystemService(AUDIO_SERVICE);
                 audio.adjustVolume(AudioManager.ADJUST_LOWER, 0);
             } else {
-                audio = (AudioManager)context.getSystemService(AUDIO_SERVICE);
+                audio = (AudioManager) context.getSystemService(AUDIO_SERVICE);
                 mode = audio.getRingerMode();
                 volumn = audio.getStreamVolume(STREAM_RING);
                 audio.setStreamVolume(STREAM_RING, 0, 0);

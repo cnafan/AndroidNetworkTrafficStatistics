@@ -12,11 +12,11 @@ import android.net.TrafficStats;
 import android.os.Build;
 import android.util.Log;
 
-import java.text.DecimalFormat;
 import java.util.Objects;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
 /**
  * Created by small on 2016/9/30.
@@ -42,8 +42,6 @@ public class AlarmReceiverTiming extends BroadcastReceiver implements Notificati
                 SharedPreferences.Editor editor = context.getSharedPreferences("data", Context.MODE_PRIVATE).edit();
                 SharedPreferences pref = context.getSharedPreferences("data", Context.MODE_PRIVATE);
 
-                //boolean isreboot = pref.getBoolean("isreboot", false); //2
-                //boolean iszero = pref.getBoolean("iszero", true);//3
                 long cur_boot_mobiletx = TrafficStats.getMobileTxBytes();
                 long cur_boot_mobilerx = TrafficStats.getMobileRxBytes();
                 long thisbootflow = cur_boot_mobilerx + cur_boot_mobiletx;//4
@@ -67,19 +65,25 @@ public class AlarmReceiverTiming extends BroadcastReceiver implements Notificati
             Log.d("qiang", "网络没有连接,所以终止定时广播");
         }
     }
-
     @Override
     public void show_notifiction(Context context, long curdayflow) {
+
+        SharedPreferences pref_default = getDefaultSharedPreferences(context);
+        if (!pref_default.getBoolean("ShowNotification",true)){
+            return;
+        }
+
         SharedPreferences pref = context.getSharedPreferences("data", MODE_PRIVATE);
-        String remain_liuliang = pref.getString("remain_liuliang", "");
-        String all_liuliang = pref.getString("all_liuliang", "");
+        long remain_liuliang = pref.getLong("remain_liuliang", 0);
+        long all_liuliang = pref.getLong("all_liuliang", 0);
+        long curmonthflow=pref.getLong("curmonthflow",0);
         notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         String notification_string;
 
         if (Objects.equals(remain_liuliang, "") | Objects.equals(all_liuliang, "")) {
             notification_string = "无流量数据，请启动应用查询";
         } else {
-            notification_string = "本月流量还剩 " + remain_liuliang + " 今日已用" + show_change(curdayflow);
+            notification_string = "本月流量还剩 " + new Formatdata().longtostring(remain_liuliang-curmonthflow-curdayflow) + " 今日已用" + new Formatdata().longtostring(curdayflow);
         }
         Notification.Builder builder = new Notification.Builder(context);
         builder.setSmallIcon(R.mipmap.ic_album_black_24dp)
@@ -94,16 +98,4 @@ public class AlarmReceiverTiming extends BroadcastReceiver implements Notificati
         }
     }
 
-    String show_change(long data) {
-
-        DecimalFormat df = new DecimalFormat("#.##");
-        double bytes = data / 1024.0;
-        if (bytes > 1048576.0 && bytes / 1048576.0 > 0) {
-            return df.format(bytes / 1048576.0) + "G";
-        } else if (bytes > 1024.0 && bytes / 1024.0 > 0) {
-            return df.format(bytes / 1024.0) + "M";
-        } else {
-            return df.format(bytes) + "k";
-        }
-    }
 }

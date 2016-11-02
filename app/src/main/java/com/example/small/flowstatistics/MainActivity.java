@@ -39,11 +39,11 @@ import android.widget.Toast;
 import org.apache.http.util.EncodingUtils;
 
 import java.io.FileInputStream;
-import java.text.DecimalFormat;
 import java.util.Objects;
 
 import static android.media.AudioManager.RINGER_MODE_SILENT;
 import static android.media.AudioManager.STREAM_RING;
+import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, SMSBroadcastReceiver.Interaction, Notifications.Interaction_notification {
 
@@ -74,13 +74,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SharedPreferences pref = getSharedPreferences("data", MODE_PRIVATE);
         boolean isfirstrun = pref.getBoolean("isfirstrun", true);
         if (isfirstrun) {
-            //editor.putBoolean("isreboot", false);//1
-            //editor.putBoolean("iszero", false);//2
             editor.putLong("thisbootflow", 0);//3
             editor.putLong("curdayflow", 0);//4
             editor.putLong("onedaylastbootflow", 0);//一日内上次开机使用的流量 5
             editor.putLong("onebootlastdayflow", 0);//一次开机前一天使用的流量 6
             editor.putBoolean("isfirstrun", false);
+            editor.putLong("curmonthflow", 0);//7
             editor.commit();
 
             if (isMIUI()) {
@@ -94,13 +93,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 });
             }
         }
-
         if (!isMyServiceRunning()) {
-            Intent intent = new Intent(this, AlarmTimingStart.class);
             Intent intent2 = new Intent(this, AlarmManualStart.class);
+            startService(intent2);
+            Intent intent = new Intent(this, AlarmTimingStart.class);
             //开启Service
             startService(intent);
-            startService(intent2);
         }
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
@@ -160,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 final AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
                 alertDialog.setTitle("帮助");
                 String helpmessage = "1.点击查询按钮是请务必在开启数据且关闭wifi后。" +
-                        "\n2.使用校正功能后请点击查询按钮导入设置。" + "\n3.每日自动校正将于次日早上6点开始。";
+                        "\n2.使用校正功能后请点击查询按钮导入设置。";
                 alertDialog.setMessage(helpmessage);
                 alertDialog.setPositiveButton("OK", null);
                 alertDialog.show();
@@ -181,19 +179,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 NetworkInfo activeInfo = manager.getActiveNetworkInfo();
                 if (activeInfo == null) {
                     Log.d("qiang", "网络没有连接");
-
                     Toast.makeText(this, "请关闭wifi并打开数据开关后查询", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (activeInfo.isConnected()) {
                     if (Objects.equals(activeInfo.getTypeName(), "MOBILE")) {
-
                         Sendmessage sendmessage = new Sendmessage();//发送短信
                         if (Build.VERSION.SDK_INT >= 23) {
                             int checkCallPhonePermission = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECEIVE_SMS);
                             if (checkCallPhonePermission != PackageManager.PERMISSION_GRANTED) {
                                 ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECEIVE_SMS}, REQUEST_CODE);
-
                             } else {
                                 progressDialog = new ProgressDialog(MainActivity.this);
                                 progressDialog.setMessage("查询中...");
@@ -203,7 +198,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 sendmessage.Sendmessages();
                                 //静音
                                 sendmessage.silent();
-
                                 Snackbar.make(v, "已发送", Snackbar.LENGTH_LONG).setAction("", null).show();
                                 Log.d("qiang", "发送成功");
                             }
@@ -216,20 +210,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             sendmessage.Sendmessages();
                             //静音
                             sendmessage.silent();
-
                             Snackbar.make(v, "已发送", Snackbar.LENGTH_LONG).setAction("", null).show();
                             Log.d("qiang", "发送成功");
                         }
-
                         IntentFilter intentFilter = new IntentFilter();
                         intentFilter.addAction("android.provider.Telephony.SMS_RECEIVED");
                         SMSBroadcastReceiver dianLiangBR = new SMSBroadcastReceiver();
                         registerReceiver(dianLiangBR, intentFilter);
                         dianLiangBR.setInteractionListener(MainActivity.this);
                     } else {
-
                         Toast.makeText(this, "请关闭wifi并打开数据开关后查询", Toast.LENGTH_SHORT).show();
-
                     }
                 } else {
                     Toast.makeText(this, "请关闭wifi并打开数据开关后查询", Toast.LENGTH_SHORT).show();
@@ -239,18 +229,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void show_notifiction(Context context, long curdayflow) {
+
+        SharedPreferences pref_default = getDefaultSharedPreferences(context);
+        if (!pref_default.getBoolean("ShowNotification",true)){
+            return;
+        }
+
         SharedPreferences pref = context.getSharedPreferences("data", MODE_PRIVATE);
-        String remain_liuliang = pref.getString("remain_liuliang", "");
-        String all_liuliang = pref.getString("all_liuliang", "");
+        long remain_liuliang = pref.getLong("remain_liuliang", 0);
+        long all_liuliang = pref.getLong("all_liuliang", 0);
+        long curmonthflow=pref.getLong("curmonthflow",0);
         notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         String notification_string;
-
-        //long today = calculate_today(this);
 
         if (Objects.equals(remain_liuliang, "") | Objects.equals(all_liuliang, "")) {
             notification_string = "无流量数据，请启动应用查询";
         } else {
-            notification_string = "本月流量还剩 " + remain_liuliang + " 今日已用" + show_change(curdayflow);
+            notification_string = "本月流量还剩 " + new Formatdata().longtostring(remain_liuliang-curmonthflow-curdayflow) + " 今日已用" + new Formatdata().longtostring(curdayflow);
         }
         Notification.Builder builder = new Notification.Builder(context);
         builder.setSmallIcon(R.mipmap.ic_album_black_24dp)
@@ -282,14 +277,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (content != null && content1 != null) {
             SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
             progressDialog.dismiss();
-            editor.putString("remain_liuliang", content);
-            editor.putString("all_liuliang", content1);
+
+            editor.putLong("remain_liuliang", new Formatdata().GetNumFromString(content));
+            editor.putLong("all_liuliang", new Formatdata().GetNumFromString(content1));
             editor.commit();
 
             CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();
             long todayflow = calculateTodayFlow.calculate(context);
             show_notifiction(this, todayflow);
-
         } else {
             Toast.makeText(this, "查询失败-.-", Toast.LENGTH_LONG).show();
         }
@@ -319,7 +314,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /**
-     * 跳转到应用权限设置页面 http://www.tuicool.com/articles/jUby6rA
+     * 跳转到应用权限设置页面
      *
      * @param context 传入app 或者 activity
      *                context，通过context获取应用packegename，之后通过packegename跳转制定应用
@@ -417,16 +412,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return res;
     }//读取到/data/data/目录
 
-    String show_change(long data) {
-        DecimalFormat df = new DecimalFormat("#.##");
-        double bytes = data / 1024.0;
-        if (bytes > 1048576.0 && bytes / 1048576.0 > 0) {
-            return df.format(bytes / 1048576.0) + "G";
-        } else if (bytes > 1024.0 && bytes / 1024.0 > 0) {
-            return df.format(bytes / 1024.0) + "M";
-        } else {
-            return df.format(bytes) + "k";
-        }
-    }
 
 }

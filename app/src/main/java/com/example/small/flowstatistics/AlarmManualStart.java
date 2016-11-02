@@ -36,7 +36,7 @@ public class AlarmManualStart extends Service {
         calendar.setTimeInMillis(System.currentTimeMillis());
         // 这里时区需要设置一下，不然会有8个小时的时间差
         calendar.setTimeZone(TimeZone.getTimeZone("GMT+8"));
-        calendar.set(Calendar.HOUR_OF_DAY, 6);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);

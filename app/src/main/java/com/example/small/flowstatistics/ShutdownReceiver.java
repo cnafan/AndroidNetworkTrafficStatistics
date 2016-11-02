@@ -24,10 +24,7 @@ public class ShutdownReceiver extends BroadcastReceiver {
         SharedPreferences pref = context.getSharedPreferences("data", MODE_PRIVATE);
 
         //long result;//1 当日使用流量
-        //boolean isreboot = pref.getBoolean("isreboot", false); //2 重启过
-        //boolean iszero = pref.getBoolean("iszero", false);//3 过0点
         long thisbootflow = pref.getLong("thisbootflow", 0);  //4
-        //Log.d("qiang", "thisbootflow:" + thisbootflow);
         long onedaylastbootflow = pref.getLong("onedaylastbootflow", 0);//5
         long onebootlastdayflow = pref.getLong("onebootlastdayflow", 0);//6
         //long curdayflow = pref.getLong("curdayflow", 0);
@@ -47,12 +44,9 @@ public class ShutdownReceiver extends BroadcastReceiver {
                 thisbootflow = cur_boot_mobilerx + cur_boot_mobiletx;
             }
         }
-
         onedaylastbootflow = onedaylastbootflow + thisbootflow - onebootlastdayflow;
         editor.putLong("onedaylastbootflow", onedaylastbootflow);
         editor.putLong("onebootlastdayflow", 0);
-        //editor.putBoolean("isreboot", true);
-        //editor.putBoolean("iszero", false);
         editor.commit();
         Log.d("qiang", "shutdown");
     }
