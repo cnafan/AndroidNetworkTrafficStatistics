@@ -16,6 +16,7 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.Calendar;
 import java.util.Objects;
 
 import static android.content.Context.AUDIO_SERVICE;
@@ -54,12 +55,17 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
             context.getApplicationContext().registerReceiver(dianLiangBR, intentFilter);
             dianLiangBR.setInteractionListener(this);
         }
-
+        Calendar calendar = Calendar.getInstance();
+        int cuday = calendar.get(Calendar.DAY_OF_MONTH);
+        int curmonth = calendar.get(Calendar.MONTH);
+        if (Objects.equals(Integer.valueOf(pref_default.getString("remonth", "")), cuday) && curmonth != pref.getInt("savemonth", 0)) {
+            editor.putLong("curmonthflow", 0);
+        }
         CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();
         long todayflow = calculateTodayFlow.calculate(context);
-        long curmonthflow=pref.getLong("curmonthflow",0);
-        curmonthflow= curmonthflow+todayflow;
-        editor.putLong("curmonthflow",curmonthflow);
+        long curmonthflow = pref.getLong("curmonthflow", 0);
+        curmonthflow = curmonthflow + todayflow;
+        editor.putLong("curmonthflow", curmonthflow);
 
         //启动longRunningService
         Intent i = new Intent(context, AlarmManualStart.class);
@@ -87,7 +93,6 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
         editor.putLong("onebootlastdayflow", onebootlastdayflow);
         //editor.putLong("onedaylastbootflow", 0);
         editor.commit();
-
         Log.d("qiang", "每日更新广播处理完毕manual");
     }
 
@@ -95,20 +100,21 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
     public void show_notifiction(Context context, long curdayflow) {
 
         SharedPreferences pref_default = getDefaultSharedPreferences(context);
-        if (!pref_default.getBoolean("ShowNotification",true)){
+        if (!pref_default.getBoolean("ShowNotification", true)) {
             return;
         }
 
         SharedPreferences pref = context.getSharedPreferences("data", MODE_PRIVATE);
         long remain_liuliang = pref.getLong("remain_liuliang", 0);
         long all_liuliang = pref.getLong("all_liuliang", 0);
+        long curmonthflow = pref.getLong("curmonthflow", 0);
         notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         String notification_string;
 
         if (Objects.equals(remain_liuliang, "") | Objects.equals(all_liuliang, "")) {
             notification_string = "无流量数据，请启动应用查询";
         } else {
-            notification_string = "本月流量还剩 " + new Formatdata().longtostring(remain_liuliang) + " 今日已用" + new Formatdata().longtostring(curdayflow);
+            notification_string = "本月流量还剩 " + new Formatdata().longtostring(remain_liuliang - curmonthflow - curdayflow) + " 今日已用" + new Formatdata().longtostring(curdayflow);
         }
         Notification.Builder builder = new Notification.Builder(context);
         builder.setSmallIcon(R.mipmap.ic_album_black_24dp)
@@ -123,9 +129,10 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
         }
     }
 
+
     @Override
     public void setTexts(Context context, String content, String content1) {
-    //delay();
+        //delay();
         try {
             //Log.d("qiang", "delay");
             Thread.currentThread();
@@ -139,6 +146,7 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
             SharedPreferences.Editor editor = context.getSharedPreferences("data", MODE_PRIVATE).edit();
             editor.putLong("remain_liuliang", new Formatdata().GetNumFromString(content));
             editor.putLong("all_liuliang", new Formatdata().GetNumFromString(content1));
+            editor.putLong("curmonthflow", 0);
             editor.commit();
 
             CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();

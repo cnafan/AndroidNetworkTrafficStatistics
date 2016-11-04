@@ -39,6 +39,7 @@ import android.widget.Toast;
 import org.apache.http.util.EncodingUtils;
 
 import java.io.FileInputStream;
+import java.util.Calendar;
 import java.util.Objects;
 
 import static android.media.AudioManager.RINGER_MODE_SILENT;
@@ -57,11 +58,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public Button button;
     public FloatingActionButton fab;
 
-
     private static final int REQUEST_CODE = 1;
-
     private static final int RECEIVE_SMS_REQUEST_CODE = 2;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +72,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SharedPreferences pref = getSharedPreferences("data", MODE_PRIVATE);
         boolean isfirstrun = pref.getBoolean("isfirstrun", true);
         if (isfirstrun) {
+            Calendar calendar = Calendar.getInstance();
+            int curmonth = calendar.get(Calendar.MONTH);
+            editor.putInt("savemonth", curmonth);
             editor.putLong("thisbootflow", 0);//3
             editor.putLong("curdayflow", 0);//4
             editor.putLong("onedaylastbootflow", 0);//一日内上次开机使用的流量 5
@@ -81,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             editor.putBoolean("isfirstrun", false);
             editor.putLong("curmonthflow", 0);//7
             editor.commit();
-
             if (isMIUI()) {
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
                 alertDialog.setMessage("检测到您的手机为MIUI系统，软件正常运行需要申请权限，现跳转至权限管理界面");
@@ -231,21 +231,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void show_notifiction(Context context, long curdayflow) {
 
         SharedPreferences pref_default = getDefaultSharedPreferences(context);
-        if (!pref_default.getBoolean("ShowNotification",true)){
+        if (!pref_default.getBoolean("ShowNotification", true)) {
             return;
         }
 
         SharedPreferences pref = context.getSharedPreferences("data", MODE_PRIVATE);
         long remain_liuliang = pref.getLong("remain_liuliang", 0);
         long all_liuliang = pref.getLong("all_liuliang", 0);
-        long curmonthflow=pref.getLong("curmonthflow",0);
+        long curmonthflow = pref.getLong("curmonthflow", 0);
         notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         String notification_string;
 
         if (Objects.equals(remain_liuliang, "") | Objects.equals(all_liuliang, "")) {
             notification_string = "无流量数据，请启动应用查询";
         } else {
-            notification_string = "本月流量还剩 " + new Formatdata().longtostring(remain_liuliang-curmonthflow-curdayflow) + " 今日已用" + new Formatdata().longtostring(curdayflow);
+            notification_string = "本月流量还剩 " + new Formatdata().longtostring(remain_liuliang - curmonthflow - curdayflow) + " 今日已用" + new Formatdata().longtostring(curdayflow);
         }
         Notification.Builder builder = new Notification.Builder(context);
         builder.setSmallIcon(R.mipmap.ic_album_black_24dp)
@@ -277,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (content != null && content1 != null) {
             SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
             progressDialog.dismiss();
-
+            editor.putLong("curmonthflow", 0);
             editor.putLong("remain_liuliang", new Formatdata().GetNumFromString(content));
             editor.putLong("all_liuliang", new Formatdata().GetNumFromString(content1));
             editor.commit();

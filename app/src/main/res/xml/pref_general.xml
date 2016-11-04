@@ -29,7 +29,7 @@
         android:defaultValue="1"
         android:entries="@array/month_day"
         android:entryValues="@array/month_day"
-        android:key="list_preference_1"
+        android:key="remonth"
         android:title="每月流量统计起始日期" />
 
 </PreferenceScreen>
