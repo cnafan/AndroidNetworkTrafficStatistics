@@ -10,8 +10,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.TrafficStats;
 import android.os.Build;
+import android.text.format.Time;
 import android.util.Log;
 
+import java.io.IOException;
 import java.util.Objects;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -39,6 +41,16 @@ public class AlarmReceiverTiming extends BroadcastReceiver implements Notificati
         }
         if (activeInfo.isConnected()) {
             if (Objects.equals(activeInfo.getTypeName(), "MOBILE")) {
+
+                //log
+                Time time = new Time();
+                time.setToNow();
+                try {
+                    new FileManager().writeFile(context,"log",time.monthDay+":"+time.hour+":"+time.minute+"\n");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 SharedPreferences.Editor editor = context.getSharedPreferences("data", Context.MODE_PRIVATE).edit();
                 SharedPreferences pref = context.getSharedPreferences("data", Context.MODE_PRIVATE);
 
@@ -65,6 +77,7 @@ public class AlarmReceiverTiming extends BroadcastReceiver implements Notificati
             Log.d("qiang", "网络没有连接,所以终止定时广播");
         }
     }
+
     @Override
     public void show_notifiction(Context context, long curdayflow) {
 
