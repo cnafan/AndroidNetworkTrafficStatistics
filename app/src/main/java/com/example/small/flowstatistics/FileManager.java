@@ -4,11 +4,11 @@ import android.content.Context;
 
 import org.apache.http.util.EncodingUtils;
 
-import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+
+import static android.content.Context.MODE_APPEND;
 
 /**
  * Created by small on 2016/11/7.
@@ -18,17 +18,18 @@ class FileManager {
 
     //写数据
     void writeFile(Context context, String fileName, String writestr) throws IOException {
-        try {
+        try {/*
             BufferedWriter fout = new BufferedWriter(new OutputStreamWriter(
                     new FileOutputStream(fileName, true)));
             /*** 追加文件：使用FileOutputStream，在构造FileOutputStream时，把第二个参数设为true
-             */
+
             fout.write(writestr);
-            /*
-            FileOutputStream fout = context.openFileOutput(fileName, MODE_PRIVATE);
+            */
+
+            FileOutputStream fout = context.openFileOutput(fileName, MODE_APPEND);
             byte[] bytes = writestr.getBytes();
             fout.write(bytes);
-            */
+
             fout.close();
         } catch (Exception e) {
             e.printStackTrace();

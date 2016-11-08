@@ -12,14 +12,18 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
-import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -33,12 +37,12 @@ import java.util.List;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class SettingsActivity extends AppCompatPreferenceActivity {
+public class SettingsActivity extends AppCompatPreferenceActivity implements Preference.OnPreferenceClickListener,Preference.OnPreferenceChangeListener {
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
+    private static OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new OnPreferenceChangeListener() {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
             String stringValue = value.toString();
@@ -161,6 +165,59 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 || NotificationPreferenceFragment.class.getName().equals(fragmentName);
     }
 
+    // 对控件进行的一些操作
+    private void ChangeoperatePreference(Preference preference) {
+        if (preference.getKey().equals("log")) {   //change log switch"
+            Log.i("qiang", " ichange log switch " );
+            // if(preference.getKey().equals("log").isCheck())
+            try {
+                writeFile(this,"log","");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Log.d("qiang","清空log");
+        }
+    }
+
+    // 对控件进行的一些操作
+    private void ClickoperatePreference(Preference preference) {
+
+        if (preference.getKey().equals("apply_internet")) {   //点击了"Internet共享"
+            Log.i("qiang", " internet CB, and isCheckd = ");
+        }
+    }
+    //写数据
+    void writeFile(Context context, String fileName, String writestr) throws IOException {
+        try {/*
+            BufferedWriter fout = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(fileName, true)));
+            /*** 追加文件：使用FileOutputStream，在构造FileOutputStream时，把第二个参数设为true
+
+            fout.write(writestr);
+            */
+
+            FileOutputStream fout = context.openFileOutput(fileName, MODE_APPEND);
+            byte[] bytes = writestr.getBytes();
+            fout.write(bytes);
+
+            fout.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public boolean onPreferenceChange(Preference preference, Object newValue) {
+        ChangeoperatePreference(preference);
+        return false;
+    }
+
+    @Override
+    public boolean onPreferenceClick(Preference preference) {
+        ClickoperatePreference(preference);
+        return false;
+    }
+
     /**
      * This fragment shows general preferences only. It is used when the
      * activity is showing a two-pane settings UI.
@@ -180,6 +237,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 //    bindPreferenceSummaryToValue(findPreference("example_text"));
             //      bindPreferenceSummaryToValue(findPreference("example_list"));
         }
+
 
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {

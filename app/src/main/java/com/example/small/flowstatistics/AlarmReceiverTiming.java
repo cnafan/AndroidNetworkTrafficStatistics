@@ -29,7 +29,7 @@ public class AlarmReceiverTiming extends BroadcastReceiver implements Notificati
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d("qiang", "定时更新广播收到");
+        Log.d("qiang", "快速更新广播收到");
 
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mobileInfo = manager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
@@ -45,12 +45,14 @@ public class AlarmReceiverTiming extends BroadcastReceiver implements Notificati
                 //log
                 Time time = new Time();
                 time.setToNow();
+                Log.d("qiang","log write就是这里1");
                 try {
-                    new FileManager().writeFile(context,"log",time.monthDay+":"+time.hour+":"+time.minute+"\n");
+                    new FileManager().writeFile(context,"log",time.monthDay+":"+time.hour+":"+time.minute+":"+time.second+"\n");
+                    Log.d("qiang","log write");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
+                Log.d("qiang","log write就是这里2");
                 SharedPreferences.Editor editor = context.getSharedPreferences("data", Context.MODE_PRIVATE).edit();
                 SharedPreferences pref = context.getSharedPreferences("data", Context.MODE_PRIVATE);
 
@@ -80,12 +82,10 @@ public class AlarmReceiverTiming extends BroadcastReceiver implements Notificati
 
     @Override
     public void show_notifiction(Context context, long curdayflow) {
-
         SharedPreferences pref_default = getDefaultSharedPreferences(context);
         if (!pref_default.getBoolean("ShowNotification", true)) {
             return;
         }
-
         SharedPreferences pref = context.getSharedPreferences("data", MODE_PRIVATE);
         long remain_liuliang = pref.getLong("remain_liuliang", 0);
         long all_liuliang = pref.getLong("all_liuliang", 0);
