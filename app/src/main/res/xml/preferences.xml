@@ -1,16 +1,20 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <SwitchPreference
         android:defaultValue="true"
         android:key="ShowNotification"
         android:summary="通知栏常驻通知"
         android:title="显示通知" />
+
     <SwitchPreference
         android:defaultValue="false"
         android:key="log"
         android:summary="将会产生大量调试记录"
         android:title="记录日志" />
+
     <SwitchPreference
         android:defaultValue="false"
         android:key="AutomaticCheck"
@@ -25,6 +29,7 @@
         android:singleLine="true"
         android:summary="减去不可用流量（M）"
         android:title="校正(M)" />
+
     <ListPreference
         android:defaultValue="1"
         android:entries="@array/month_day"

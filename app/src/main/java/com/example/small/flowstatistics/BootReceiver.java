@@ -34,6 +34,7 @@ public class BootReceiver extends BroadcastReceiver implements Notifications.Int
             show_notifiction(context, curdayflow);
         }
     }
+
     @Override
     public void show_notifiction(Context context, long curdayflow) {
 

@@ -57,6 +57,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int RECEIVE_SMS_REQUEST_CODE = 2;
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences pref = getSharedPreferences("data", MODE_PRIVATE);
+        long remain_liuliang = pref.getLong("remain_liuliang", 0);
+        long all_liuliang = pref.getLong("all_liuliang", 0);
+        String textstr = "本月可用流量：" + new Formatdata().longtostring(all_liuliang) + "\n本月已用流量：" + new Formatdata().longtostring(all_liuliang - remain_liuliang) + "\n本月还剩流量：" + new Formatdata().longtostring(remain_liuliang);
+        textView = (TextView) findViewById(R.id.main);
+        textView.setText(textstr);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -98,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -146,13 +158,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int id = item.getItemId();
         switch (id) {
             case R.id.action_settings:
-                Intent intent_setting = new Intent(this, SettingsActivity.class);
-                startActivity(intent_setting);
+                Intent settingintent = new Intent(MainActivity.this, SettingActivity.class);
+                startActivity(settingintent);
                 break;
             case R.id.log:
                 final AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(this);
                 alertDialog2.setTitle("log");
-                String logstr=new FileManager().readLogFile(this,"log");
+                String logstr = new FileManager().readLogFile(this, "log");
                 alertDialog2.setMessage(logstr);
                 alertDialog2.setPositiveButton("OK", null);
                 alertDialog2.show();

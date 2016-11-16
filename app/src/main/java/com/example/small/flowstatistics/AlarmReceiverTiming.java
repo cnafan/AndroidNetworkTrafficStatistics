@@ -43,16 +43,20 @@ public class AlarmReceiverTiming extends BroadcastReceiver implements Notificati
             if (Objects.equals(activeInfo.getTypeName(), "MOBILE")) {
 
                 //log
-                Time time = new Time();
-                time.setToNow();
-                Log.d("qiang","log write就是这里1");
-                try {
-                    new FileManager().writeFile(context,"log",time.monthDay+":"+time.hour+":"+time.minute+":"+time.second+"\n");
-                    Log.d("qiang","log write");
-                } catch (IOException e) {
-                    e.printStackTrace();
+                SharedPreferences pref_default = getDefaultSharedPreferences(context);
+                if(pref_default.getBoolean("log",false)) {
+                    Time time = new Time();
+                    time.setToNow();
+                    Log.d("qiang", "log write就是这里1");
+                    try {
+                        new FileManager().writeFile(context, "log", time.monthDay + ":" + time.hour + ":" + time.minute + ":" + time.second + "\n");
+                        Log.d("qiang", "log write");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Log.d("qiang", "log write就是这里2");
                 }
-                Log.d("qiang","log write就是这里2");
+
                 SharedPreferences.Editor editor = context.getSharedPreferences("data", Context.MODE_PRIVATE).edit();
                 SharedPreferences pref = context.getSharedPreferences("data", Context.MODE_PRIVATE);
 
