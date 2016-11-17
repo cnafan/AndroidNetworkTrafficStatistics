@@ -2,8 +2,6 @@ package com.example.small.flowstatistics;
 
 import android.Manifest;
 import android.app.ActivityManager;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -32,7 +30,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,17 +38,15 @@ import java.util.Objects;
 
 import static android.media.AudioManager.RINGER_MODE_SILENT;
 import static android.media.AudioManager.STREAM_RING;
-import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, SMSBroadcastReceiver.Interaction, Notifications.Interaction_notification {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, SMSBroadcastReceiver.Interaction {
 
     private int volumn = 0;
-    public NotificationManager notificationManager;
     public AudioManager audio;
     public int mode;
     public TextView textView;
     private ProgressDialog progressDialog;
-    public Button button;
+    //public Button button;
     public FloatingActionButton fab;
     private static final int REQUEST_CODE = 1;
     private static final int RECEIVE_SMS_REQUEST_CODE = 2;
@@ -122,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     // Permission Granted
                     progressDialog = new ProgressDialog(MainActivity.this);
                     progressDialog.setMessage("查询中...");
-                    progressDialog.setCancelable(false);
+                    progressDialog.setCancelable(true);
                     progressDialog.show();
                     Sendmessage sendmessage = new Sendmessage();
                     sendmessage.Sendmessages();
@@ -164,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.log:
                 final AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(this);
                 alertDialog2.setTitle("log");
-                String logstr = new FileManager().readLogFile(this, "log");
+                String logstr = new FileManager().readLogFile(this);
                 alertDialog2.setMessage(logstr);
                 alertDialog2.setPositiveButton("OK", null);
                 alertDialog2.show();
@@ -207,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             } else {
                                 progressDialog = new ProgressDialog(MainActivity.this);
                                 progressDialog.setMessage("查询中...");
-                                progressDialog.setCancelable(false);
+                                progressDialog.setCancelable(true);
                                 progressDialog.show();
 
                                 sendmessage.Sendmessages();
@@ -219,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         } else {
                             progressDialog = new ProgressDialog(MainActivity.this);
                             progressDialog.setMessage("查询中...");
-                            progressDialog.setCancelable(false);
+                            progressDialog.setCancelable(true);
                             progressDialog.show();
 
                             sendmessage.Sendmessages();
@@ -243,42 +238,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void show_notifiction(Context context, long curdayflow) {
-
-        SharedPreferences pref_default = getDefaultSharedPreferences(context);
-        if (!pref_default.getBoolean("ShowNotification", true)) {
-            return;
-        }
-
-        SharedPreferences pref = context.getSharedPreferences("data", MODE_PRIVATE);
-        long remain_liuliang = pref.getLong("remain_liuliang", 0);
-        long all_liuliang = pref.getLong("all_liuliang", 0);
-        long curmonthflow = pref.getLong("curmonthflow", 0);
-        notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        String notification_string;
-
-        if (Objects.equals(remain_liuliang, "") | Objects.equals(all_liuliang, "")) {
-            notification_string = "无流量数据，请启动应用查询";
-        } else {
-            notification_string = "本月流量还剩 " + new Formatdata().longtostring(remain_liuliang - curmonthflow - curdayflow) + " 今日已用" + new Formatdata().longtostring(curdayflow);
-        }
-        Notification.Builder builder = new Notification.Builder(context);
-        builder.setSmallIcon(R.mipmap.ic_album_black_24dp)
-                .setContentTitle("流量计")
-                .setAutoCancel(true)
-                .setOngoing(true)
-                .setContentText(notification_string);
-        if (Build.VERSION.SDK_INT < 16) {
-            notificationManager.notify(0, builder.getNotification());
-        } else {
-            notificationManager.notify(0, builder.build());
-        }
-    }
-
-    @Override
     public void setTexts(Context context, String content, String content1) {
-//delay();
-
+        //delay();
         try {
             Log.d("qiang", "delay");
             Thread.currentThread();
@@ -286,9 +247,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
         recovery();
-
         if (content != null && content1 != null) {
             SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
             progressDialog.dismiss();
@@ -299,7 +258,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();
             long todayflow = calculateTodayFlow.calculate(context);
-            show_notifiction(this, todayflow);
+            //show_notifiction(this, todayflow);
+            new NotificationManagers().showNotificationPrecise(context,todayflow);
         } else {
             Toast.makeText(this, "查询失败-.-", Toast.LENGTH_LONG).show();
         }
@@ -339,7 +299,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         boolean mark = isMIUI();
 
         if (mark) {
-
             // 只兼容miui v5/v6 的应用权限设置页面，否则的话跳转应用设置页面（权限设置上一级页面）
             try {
                 Intent localIntent = new Intent(
@@ -359,7 +318,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 context.startActivity(intent);
             }
         }
-
         return mark;
     }
 
@@ -376,7 +334,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void recovery() {
         //Log.d("qiang", "volumn:" + volumn);
         if (Build.VERSION.SDK_INT >= 24) {
-
             audio = (AudioManager) getSystemService(AUDIO_SERVICE);
         } else {
             audio = (AudioManager) getSystemService(AUDIO_SERVICE);
@@ -391,7 +348,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             manager.sendTextMessage(getString(R.string.phone), null, getString(R.string.message_search), null, null);  //发送短信
             Log.d("qiang", "发送短信中");
         }
-
         void silent() {
             //静音--------
             if (Build.VERSION.SDK_INT >= 24) {

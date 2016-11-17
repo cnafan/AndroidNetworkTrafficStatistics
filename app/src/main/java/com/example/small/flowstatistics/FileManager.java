@@ -17,29 +17,22 @@ import static android.content.Context.MODE_APPEND;
 class FileManager {
 
     //写数据
-    void writeFile(Context context, String fileName, String writestr) throws IOException {
-        try {/*
-            BufferedWriter fout = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(fileName, true)));
-            /*** 追加文件：使用FileOutputStream，在构造FileOutputStream时，把第二个参数设为true
-
-            fout.write(writestr);
-            */
+    void writeFileAppend(Context context, String fileName, String writestr) throws IOException {
+        try {
 
             FileOutputStream fout = context.openFileOutput(fileName, MODE_APPEND);
             byte[] bytes = writestr.getBytes();
             fout.write(bytes);
-
             fout.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    String readLogFile(Context context, String fileName) {
+    String readLogFile(Context context) {
         String res = "";
         try {
-            FileInputStream fin = context.openFileInput(fileName);
+            FileInputStream fin = context.openFileInput("log");
             int length = fin.available();
             byte[] buffer = new byte[length];
             fin.read(buffer);

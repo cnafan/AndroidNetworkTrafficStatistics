@@ -1,6 +1,5 @@
 package com.example.small.flowstatistics;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -21,7 +20,6 @@ import java.util.Objects;
 
 import static android.content.Context.AUDIO_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
-import static android.content.Context.NOTIFICATION_SERVICE;
 import static android.media.AudioManager.RINGER_MODE_SILENT;
 import static android.media.AudioManager.STREAM_RING;
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
@@ -30,7 +28,7 @@ import static android.preference.PreferenceManager.getDefaultSharedPreferences;
  * Created by small on 2016/9/30.
  */
 
-public class AlarmReceiverManual extends BroadcastReceiver implements Notifications.Interaction_notification, SMSBroadcastReceiver.Interaction {
+public class AlarmReceiverManual extends BroadcastReceiver implements SMSBroadcastReceiver.Interaction {
     public int mode;
     public AudioManager audio;
     public int volumn = 0;
@@ -97,40 +95,6 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
     }
 
     @Override
-    public void show_notifiction(Context context, long curdayflow) {
-
-        SharedPreferences pref_default = getDefaultSharedPreferences(context);
-        if (!pref_default.getBoolean("ShowNotification", true)) {
-            return;
-        }
-
-        SharedPreferences pref = context.getSharedPreferences("data", MODE_PRIVATE);
-        long remain_liuliang = pref.getLong("remain_liuliang", 0);
-        long all_liuliang = pref.getLong("all_liuliang", 0);
-        long curmonthflow = pref.getLong("curmonthflow", 0);
-        notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        String notification_string;
-
-        if (Objects.equals(remain_liuliang, "") | Objects.equals(all_liuliang, "")) {
-            notification_string = "无流量数据，请启动应用查询";
-        } else {
-            notification_string = "本月流量还剩 " + new Formatdata().longtostring(remain_liuliang - curmonthflow - curdayflow) + " 今日已用" + new Formatdata().longtostring(curdayflow);
-        }
-        Notification.Builder builder = new Notification.Builder(context);
-        builder.setSmallIcon(R.mipmap.ic_album_black_24dp)
-                .setContentTitle("流量计")
-                .setAutoCancel(true)
-                .setOngoing(true)
-                .setContentText(notification_string);
-        if (Build.VERSION.SDK_INT < 16) {
-            notificationManager.notify(0, builder.getNotification());
-        } else {
-            notificationManager.notify(0, builder.build());
-        }
-    }
-
-
-    @Override
     public void setTexts(Context context, String content, String content1) {
         //delay();
         try {
@@ -151,8 +115,8 @@ public class AlarmReceiverManual extends BroadcastReceiver implements Notificati
 
             CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();
             long todayflow = calculateTodayFlow.calculate(context);
-            show_notifiction(context, todayflow);
-
+            //show_notifiction(context, todayflow);
+            new NotificationManagers().showNotificationPrecise(context,todayflow);
         } else {
             Toast.makeText(context, "查询失败-.-", Toast.LENGTH_LONG).show();
         }
