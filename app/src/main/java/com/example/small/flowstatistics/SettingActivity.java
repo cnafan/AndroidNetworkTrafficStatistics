@@ -1,7 +1,10 @@
 package com.example.small.flowstatistics;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -14,10 +17,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Objects;
 
+import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 import static com.example.small.flowstatistics.R.xml.preferences;
 
 /**
@@ -80,17 +86,63 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals("log")) {
-            //Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
-            Log.d("qiang", "log change");
-            try {
-                writeFile(this,"log","");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        switch (key) {
+            case "log":
+                Toast.makeText(this, "已保存", Toast.LENGTH_SHORT).show();
+                Log.d("qiang", "log change");
+                try {
+                    writeFile(this, "log", "");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case "ShowNotification":
 
+                SharedPreferences pref_default = getDefaultSharedPreferences(this);
+                if (!pref_default.getBoolean("ShowNotification", true)) {
+                    NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                    Notification.Builder builder = new Notification.Builder(this);
+                    builder.setSmallIcon(R.mipmap.ic_album_black_24dp)
+                            .setContentTitle("流量计")
+                            .setAutoCancel(true)
+                            .setOngoing(true)
+                            .setContentText("");
+                    if (Build.VERSION.SDK_INT < 16) {
+                        notificationManager.notify(0, builder.getNotification());
+                    } else {
+                        notificationManager.notify(0, builder.build());
+                    }
+                    notificationManager.cancel(0);
+                } else {
+                    SharedPreferences pref = this.getSharedPreferences("data", MODE_PRIVATE);
+                    long remain_liuliang = pref.getLong("remain_liuliang", 0);
+                    long all_liuliang = pref.getLong("all_liuliang", 0);
+                    long curmonthflow = pref.getLong("curmonthflow", 0);
+                    NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                    String notification_string;
+                    long curdayflow = pref.getLong("curdayflow", 0);//4
+
+                    if (Objects.equals(remain_liuliang, "") | Objects.equals(all_liuliang, "")) {
+                        notification_string = "无流量数据，请启动应用查询";
+                    } else {
+                        notification_string = "本月流量还剩 " + new Formatdata().longtostring(remain_liuliang - curmonthflow - curdayflow) + " 今日已用" + new Formatdata().longtostring(curdayflow);
+                    }
+                    Notification.Builder builder = new Notification.Builder(this);
+                    builder.setSmallIcon(R.mipmap.ic_album_black_24dp)
+                            .setContentTitle("流量计")
+                            .setAutoCancel(true)
+                            .setOngoing(true)
+                            .setContentText(notification_string);
+                    if (Build.VERSION.SDK_INT < 16) {
+                        notificationManager.notify(0, builder.getNotification());
+                    } else {
+                        notificationManager.notify(0, builder.build());
+                    }
+                }
+                break;
+            default:
+                break;
         }
-        Log.d("qiang", "change");
 
     }
 

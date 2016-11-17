@@ -26,6 +26,14 @@ class NotificationManagers {
     void showNotificationPrecise(Context context,long curdayflow){
         SharedPreferences pref_default = getDefaultSharedPreferences(context);
         if (!pref_default.getBoolean("ShowNotification", true)) {
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+            Notification.Builder builder = new Notification.Builder(context);
+            if (Build.VERSION.SDK_INT < 16) {
+                notificationManager.notify(0, builder.getNotification());
+            } else {
+                notificationManager.notify(0, builder.build());
+            }
+            notificationManager.cancel(0);
             return;
         }
 
