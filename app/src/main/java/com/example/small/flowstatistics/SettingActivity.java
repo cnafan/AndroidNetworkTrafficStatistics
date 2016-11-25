@@ -102,8 +102,6 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
             case "log":
                 Snackbar.make(root, "更改已保存", Snackbar.LENGTH_SHORT)
                         .show();
-
-                // Toast.makeText(this, "更改已保存", Toast.LENGTH_SHORT).show();
                 Log.d("qiang", "log change");
                 try {
                     writeFile(this, "log", "");
@@ -111,11 +109,17 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
                     e.printStackTrace();
                 }
                 break;
+            case "AutomaticCheck":
+                Snackbar.make(root, "更改已保存", Snackbar.LENGTH_SHORT)
+                        .show();
+                if (pref_default.getBoolean("ShowNotification", true)) {
+                    Intent intent2 = new Intent(this, AlarmManualStart.class);
+                    startService(intent2);
+                }
+                break;
             case "ShowNotification":
                 Snackbar.make(root, "更改已保存", Snackbar.LENGTH_SHORT)
                         .show();
-
-                // Toast.makeText(this, "更改已保存", Toast.LENGTH_SHORT).show();
                 if (!pref_default.getBoolean("ShowNotification", true)) {
                     NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                     Notification.Builder builder = new Notification.Builder(this);
@@ -160,8 +164,6 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
             case "free":
                 Snackbar.make(root, "更改已保存", Snackbar.LENGTH_SHORT)
                         .show();
-
-                // Toast.makeText(this, "更改已保存", Toast.LENGTH_SHORT).show();
                 if (pref_default.getBoolean("free", false)) {
                     startService(new Intent(this, AlarmFreeStart.class));
                     freeEditTextPreference.setSelectable(true);
@@ -174,14 +176,12 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
             case "freeflow":
                 Snackbar.make(root, "更改已保存", Snackbar.LENGTH_SHORT)
                         .show();
-
                 freeEditTextPreference.setSummary(pref_default.getString("freeflow", "0"));
                 break;
             case "remonth":
                 RemonthListPreference.setSummary(pref_default.getString("remonth", "0"));
                 break;
             default:
-
                 break;
         }
     }
