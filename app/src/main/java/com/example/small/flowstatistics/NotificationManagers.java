@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 
+import java.util.Calendar;
 import java.util.Objects;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -41,18 +42,26 @@ class NotificationManagers {
         long remain_liuliang = pref.getLong("remain_liuliang", 0);
         long all_liuliang = pref.getLong("all_liuliang", 0);
         long curmonthflow = pref.getLong("curmonthflow", 0);
+        long curfreetimeflow = pref.getLong("curfreetimeflow", 0);
+        long allfreetimeflow =  new Formatdata().GetNumFromString(pref_default.getString("freeflow", "0"));
+        long curmonthfreeflow=pref.getLong("curmonthfreeflow",0);
+
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         String notification_string;
-
         if (Objects.equals(remain_liuliang, "") | Objects.equals(all_liuliang, "")) {
             notification_string = "无流量数据，请启动应用查询";
         } else {
             if (pref_default.getBoolean("free", true)) {
-                long allfreetimeflow=pref.getLong("allfreetimeflow",0);
-                notification_string = "本月流量还剩 " + new Formatdata().longtostring(remain_liuliang - curmonthflow - curdayflow-allfreetimeflow) + " 今日已用" + new Formatdata().longtostring(curdayflow);
-            }
-            else
-            {
+                Calendar calendar = Calendar.getInstance();
+                int systemTime = calendar.get(Calendar.HOUR_OF_DAY);
+                //Toast.makeText(context,systemTime,Toast.LENGTH_SHORT);
+                if (systemTime > 22 ||systemTime < 7)  {//从23点开始截止到次日7点
+                    notification_string = "本月闲时流量还剩 " + new Formatdata().longtostring(allfreetimeflow-curmonthfreeflow-curfreetimeflow) + " 今日已用" + new Formatdata().longtostring(curfreetimeflow);
+
+                } else {
+                    notification_string = "本月流量还剩 " + new Formatdata().longtostring(remain_liuliang - curmonthflow - curdayflow - allfreetimeflow) + " 今日已用" + new Formatdata().longtostring(curdayflow);
+                }
+            } else {
                 notification_string = "本月流量还剩 " + new Formatdata().longtostring(remain_liuliang - curmonthflow - curdayflow) + " 今日已用" + new Formatdata().longtostring(curdayflow);
 
             }

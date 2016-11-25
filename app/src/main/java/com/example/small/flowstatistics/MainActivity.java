@@ -107,6 +107,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             editor.putLong("lastmonthflow", 0);
             editor.putLong("curfreetimeflow", 0);//当日闲时流量
             editor.putLong("allfreetimeflow", 0);//闲时流量总量
+            editor.putLong("curmonthfreeflow", 0);//当月使用闲时流量
+
             editor.commit();
 
             if (isMIUI()) {

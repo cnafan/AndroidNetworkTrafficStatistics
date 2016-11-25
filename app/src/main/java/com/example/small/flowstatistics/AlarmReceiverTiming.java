@@ -59,25 +59,7 @@ public class AlarmReceiverTiming extends BroadcastReceiver {
 
 
                 long freetimeflowstart = pref.getLong("freetimeflowstart", 0);
-                /*
-                // 选择的定时时间
-                Calendar calendar= Calendar.getInstance();
-                int systemTime = calendar.get(Calendar.HOUR_OF_DAY);
-                Calendar calendarstart = Calendar.getInstance();
-                calendarstart.set(Calendar.HOUR_OF_DAY, 23);
-                Calendar calendarend = Calendar.getInstance();
-                calendarend.set(Calendar.HOUR_OF_DAY, 7);
-                long selectTimestart = calendarstart.getTimeInMillis();
-                long selectTimeend = calendarstart.getTimeInMillis();
-                long systemTime = System.currentTimeMillis();
-                if (systemTime > selectTimestart) {
-                    Log.d(TAG,"23free");
-                    editor.putLong("freetimeflow", curdayflow - freetimeflowstart);
-                } else if (systemTime < selectTimeend) {
-                    Log.d(TAG,"07free");
-                    editor.putLong("freetimeflow", pref.getLong("freetimeflow", 0) + curdayflow);
-                }
-                 */
+
                 Calendar calendar= Calendar.getInstance();
                 int systemTime = calendar.get(Calendar.HOUR_OF_DAY);
                 //Toast.makeText(context,systemTime,Toast.LENGTH_SHORT);

@@ -32,17 +32,17 @@ import static com.example.small.flowstatistics.R.xml.preferences;
  */
 
 public class SettingActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
-
     private EditTextPreference CheckEditTextPreference;
     private SwitchPreference ShowNotificationSwitchPreference;
     private SwitchPreference LogSwitchPreference;
     private SwitchPreference AutomaticCheckSwitchPreference;
     private ListPreference RemonthListPreference;
-
     private SwitchPreference freeSwitchPreference;
     private EditTextPreference freeEditTextPreference;
 
     private void initPreferences() {
+        SharedPreferences pref_default = getDefaultSharedPreferences(this);
+
         CheckEditTextPreference = (EditTextPreference) findPreference("check");
         ShowNotificationSwitchPreference = (SwitchPreference) findPreference("ShowNotification");
         AutomaticCheckSwitchPreference = (SwitchPreference) findPreference("AutomaticCheck");
@@ -50,6 +50,10 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
         RemonthListPreference = (ListPreference) findPreference("remonth");
         freeEditTextPreference = (EditTextPreference) findPreference("freeflow");
         freeSwitchPreference = (SwitchPreference) findPreference("free");
+
+        //CheckEditTextPreference.setSummary(pref_default.getString("check", "0"));
+        RemonthListPreference.setSummary(pref_default.getString("remonth", "0"));
+        freeEditTextPreference.setSummary(pref_default.getString("freeflow", "0"));
     }
 
     LinearLayout root;
@@ -161,9 +165,9 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
                 if (pref_default.getBoolean("free", false)) {
                     startService(new Intent(this, AlarmFreeStart.class));
                     freeEditTextPreference.setSelectable(true);
-                    freeEditTextPreference.setSummary("手动输入闲时流量总量（M）");
+                    freeEditTextPreference.setSummary(pref_default.getString("freeflow", "0"));
                 } else {
-                    freeEditTextPreference.setSummary("不可用");
+                    freeEditTextPreference.setSummary("手动输入闲时流量总量（M)(不可用)");
                     freeEditTextPreference.setSelectable(false);
                 }
                 break;
@@ -171,12 +175,13 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
                 Snackbar.make(root, "更改已保存", Snackbar.LENGTH_SHORT)
                         .show();
 
-                RemonthListPreference.setSummary(pref_default.getString("freeflow", "0"));
+                freeEditTextPreference.setSummary(pref_default.getString("freeflow", "0"));
                 break;
             case "remonth":
                 RemonthListPreference.setSummary(pref_default.getString("remonth", "0"));
                 break;
             default:
+
                 break;
         }
     }

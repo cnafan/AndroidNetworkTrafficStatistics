@@ -22,8 +22,9 @@ public class AlarmReceiverFree extends BroadcastReceiver {
 
             CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();
             long curdayflow = calculateTodayFlow.calculate(context);
-
+            long curfreetimeflow = pref.getLong("curfreetimeflow", 0);
             editor.putLong("freetimeflowstart",curdayflow);
+            editor.putLong("curmonthfreeflow",pref.getLong("curmonthfreeflow",0)+curfreetimeflow);
             editor.commit();
         }
     }
