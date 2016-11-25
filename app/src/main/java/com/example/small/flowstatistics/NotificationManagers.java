@@ -18,12 +18,12 @@ import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
 class NotificationManagers {
 
-    void showNotificationRough(){
+    void showNotificationRough() {
 
 
     }
 
-    void showNotificationPrecise(Context context,long curdayflow){
+    void showNotificationPrecise(Context context, long curdayflow) {
         SharedPreferences pref_default = getDefaultSharedPreferences(context);
         if (!pref_default.getBoolean("ShowNotification", true)) {
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
@@ -47,7 +47,15 @@ class NotificationManagers {
         if (Objects.equals(remain_liuliang, "") | Objects.equals(all_liuliang, "")) {
             notification_string = "无流量数据，请启动应用查询";
         } else {
-            notification_string = "本月流量还剩 " + new Formatdata().longtostring(remain_liuliang - curmonthflow - curdayflow) + " 今日已用" + new Formatdata().longtostring(curdayflow);
+            if (pref_default.getBoolean("free", true)) {
+                long allfreetimeflow=pref.getLong("allfreetimeflow",0);
+                notification_string = "本月流量还剩 " + new Formatdata().longtostring(remain_liuliang - curmonthflow - curdayflow-allfreetimeflow) + " 今日已用" + new Formatdata().longtostring(curdayflow);
+            }
+            else
+            {
+                notification_string = "本月流量还剩 " + new Formatdata().longtostring(remain_liuliang - curmonthflow - curdayflow) + " 今日已用" + new Formatdata().longtostring(curdayflow);
+
+            }
         }
         Notification.Builder builder = new Notification.Builder(context);
         builder.setSmallIcon(R.mipmap.ic_album_black_24dp)

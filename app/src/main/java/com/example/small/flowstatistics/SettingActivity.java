@@ -3,6 +3,7 @@ package com.example.small.flowstatistics;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,12 +13,12 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -38,6 +39,8 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
     private SwitchPreference AutomaticCheckSwitchPreference;
     private ListPreference RemonthListPreference;
 
+    private SwitchPreference freeSwitchPreference;
+    private EditTextPreference freeEditTextPreference;
 
     private void initPreferences() {
         CheckEditTextPreference = (EditTextPreference) findPreference("check");
@@ -45,14 +48,18 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
         AutomaticCheckSwitchPreference = (SwitchPreference) findPreference("AutomaticCheck");
         LogSwitchPreference = (SwitchPreference) findPreference("log");
         RemonthListPreference = (ListPreference) findPreference("remonth");
+        freeEditTextPreference = (EditTextPreference) findPreference("freeflow");
+        freeSwitchPreference = (SwitchPreference) findPreference("free");
     }
+
+    LinearLayout root;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(preferences);
 
-        LinearLayout root = (LinearLayout) findViewById(android.R.id.list).getParent().getParent().getParent();
+        root = (LinearLayout) findViewById(android.R.id.list).getParent().getParent().getParent();
         Toolbar bar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.activity_toolbar, root, false);
         root.addView(bar, 0); // insert at top
         bar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -86,9 +93,13 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        SharedPreferences pref_default = getDefaultSharedPreferences(this);
         switch (key) {
             case "log":
-                Toast.makeText(this, "已保存", Toast.LENGTH_SHORT).show();
+                Snackbar.make(root, "更改已保存", Snackbar.LENGTH_SHORT)
+                        .show();
+
+                // Toast.makeText(this, "更改已保存", Toast.LENGTH_SHORT).show();
                 Log.d("qiang", "log change");
                 try {
                     writeFile(this, "log", "");
@@ -97,8 +108,10 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
                 }
                 break;
             case "ShowNotification":
+                Snackbar.make(root, "更改已保存", Snackbar.LENGTH_SHORT)
+                        .show();
 
-                SharedPreferences pref_default = getDefaultSharedPreferences(this);
+                // Toast.makeText(this, "更改已保存", Toast.LENGTH_SHORT).show();
                 if (!pref_default.getBoolean("ShowNotification", true)) {
                     NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                     Notification.Builder builder = new Notification.Builder(this);
@@ -140,10 +153,32 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
                     }
                 }
                 break;
+            case "free":
+                Snackbar.make(root, "更改已保存", Snackbar.LENGTH_SHORT)
+                        .show();
+
+                // Toast.makeText(this, "更改已保存", Toast.LENGTH_SHORT).show();
+                if (pref_default.getBoolean("free", false)) {
+                    startService(new Intent(this, AlarmFreeStart.class));
+                    freeEditTextPreference.setSelectable(true);
+                    freeEditTextPreference.setSummary("手动输入闲时流量总量（M）");
+                } else {
+                    freeEditTextPreference.setSummary("不可用");
+                    freeEditTextPreference.setSelectable(false);
+                }
+                break;
+            case "freeflow":
+                Snackbar.make(root, "更改已保存", Snackbar.LENGTH_SHORT)
+                        .show();
+
+                RemonthListPreference.setSummary(pref_default.getString("freeflow", "0"));
+                break;
+            case "remonth":
+                RemonthListPreference.setSummary(pref_default.getString("remonth", "0"));
+                break;
             default:
                 break;
         }
-
     }
 
     //写数据

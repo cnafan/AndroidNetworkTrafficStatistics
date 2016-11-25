@@ -38,6 +38,7 @@ import java.util.Objects;
 
 import static android.media.AudioManager.RINGER_MODE_SILENT;
 import static android.media.AudioManager.STREAM_RING;
+import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, SMSBroadcastReceiver.Interaction {
 
@@ -50,14 +51,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public FloatingActionButton fab;
     private static final int REQUEST_CODE = 1;
     private static final int RECEIVE_SMS_REQUEST_CODE = 2;
+    public SharedPreferences pref_default;
+    public SharedPreferences.Editor editor;
+    public SharedPreferences pref;
+
+    static String TAG = "qiang";
 
     @Override
     protected void onResume() {
         super.onResume();
-        SharedPreferences pref = getSharedPreferences("data", MODE_PRIVATE);
         long remain_liuliang = pref.getLong("remain_liuliang", 0);
         long all_liuliang = pref.getLong("all_liuliang", 0);
-        String textstr = "本月可用流量：" + new Formatdata().longtostring(all_liuliang) + "\n本月已用流量：" + new Formatdata().longtostring(all_liuliang - remain_liuliang) + "\n本月还剩流量：" + new Formatdata().longtostring(remain_liuliang);
+        long curdayflow = pref.getLong("curdayflow", 0);
+        long lastmonthflow = pref.getLong("lastmonthflow", 0);
+        long curfreetimeflow = pref.getLong("curfreetimeflow", 0);
+        long allfreetimeflow = pref.getLong("allfreetimeflow", 0);
+        String textstr;
+        if (pref_default.getBoolean("free", true)) {
+            textstr = "本月可用流量（含闲时）：" + new Formatdata().longtostring(all_liuliang) + "\n本月可用闲时流量：" + new Formatdata().longtostring(allfreetimeflow)
+                    + "\n本月已用流量：" + new Formatdata().longtostring(all_liuliang - remain_liuliang)
+                    + "\n本月还剩流量：" + new Formatdata().longtostring(remain_liuliang) + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow)
+                    + "\n今日使用流量(不含闲时)：" + new Formatdata().longtostring(curdayflow - curfreetimeflow) + "\n今日闲时使用流量：" + new Formatdata().longtostring(curfreetimeflow);
+
+        } else {
+            textstr = "本月可用流量：" + new Formatdata().longtostring(all_liuliang) + "\n本月已用流量：" + new Formatdata().longtostring(all_liuliang - remain_liuliang)
+                    + "\n本月还剩流量：" + new Formatdata().longtostring(remain_liuliang) + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow)
+                    + "\n今日使用流量：" + new Formatdata().longtostring(curdayflow);
+        }
+
         textView = (TextView) findViewById(R.id.main);
         textView.setText(textstr);
     }
@@ -68,9 +89,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        pref_default = getDefaultSharedPreferences(this);
+        editor = getSharedPreferences("data", Context.MODE_PRIVATE).edit();
+        pref = getSharedPreferences("data", MODE_PRIVATE);
 
-        SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
-        SharedPreferences pref = getSharedPreferences("data", MODE_PRIVATE);
         boolean isfirstrun = pref.getBoolean("isfirstrun", true);
         if (isfirstrun) {
             Calendar calendar = Calendar.getInstance();
@@ -82,7 +104,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             editor.putLong("onebootlastdayflow", 0);//一次开机前一天使用的流量 6
             editor.putBoolean("isfirstrun", false);
             editor.putLong("curmonthflow", 0);//7
+            editor.putLong("lastmonthflow", 0);
+            editor.putLong("curfreetimeflow", 0);//当日闲时流量
+            editor.putLong("allfreetimeflow", 0);//闲时流量总量
             editor.commit();
+
             if (isMIUI()) {
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
                 alertDialog.setMessage("检测到您的手机为MIUI系统，软件正常运行需要申请权限，现跳转至权限管理界面");
@@ -109,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
-        Log.d("qiang", "requestCode:" + requestCode);
+        Log.d(TAG, "requestCode:" + requestCode);
         switch (requestCode) {
             case 1:
                 Log.d("qiang", "grantResults:" + grantResults[0]);
@@ -173,6 +199,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 alertDialog.setPositiveButton("OK", null);
                 alertDialog.show();
                 break;
+            case R.id.about_activity:
+                startActivity(new Intent(MainActivity.this, AboutActivity.class));
             default:
                 break;
         }
@@ -249,7 +277,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         recovery();
         if (content != null && content1 != null) {
-            SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
             progressDialog.dismiss();
             editor.putLong("curmonthflow", 0);
             editor.putLong("remain_liuliang", new Formatdata().GetNumFromString(content));
@@ -259,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();
             long todayflow = calculateTodayFlow.calculate(context);
             //show_notifiction(this, todayflow);
-            new NotificationManagers().showNotificationPrecise(context,todayflow);
+            new NotificationManagers().showNotificationPrecise(context, todayflow);
         } else {
             Toast.makeText(this, "查询失败-.-", Toast.LENGTH_LONG).show();
         }
@@ -348,6 +375,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             manager.sendTextMessage(getString(R.string.phone), null, getString(R.string.message_search), null, null);  //发送短信
             Log.d("qiang", "发送短信中");
         }
+
         void silent() {
             //静音--------
             if (Build.VERSION.SDK_INT >= 24) {

@@ -14,4 +14,8 @@
     <item
         android:id="@+id/log"
         android:title="显示日志" />
+    <item
+        android:id="@+id/about_activity"
+        android:title="关于" />
+
 </menu>

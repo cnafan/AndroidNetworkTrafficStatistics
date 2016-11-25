@@ -18,7 +18,7 @@
     <SwitchPreference
         android:defaultValue="false"
         android:key="AutomaticCheck"
-        android:summary="每日0点校正流量数据"
+        android:summary="每日0点自动发送指令校正流量"
         android:title="开启自动校正" />
 
     <EditTextPreference
@@ -27,14 +27,31 @@
         android:key="check"
         android:maxLines="1"
         android:singleLine="true"
-        android:summary="减去不可用流量（M）"
-        android:title="校正(M)" />
+        android:summary="输入不可用流量（M）,系统将忽略此部分流量"
+        android:title="手动校正(M)" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="free"
+        android:summary="统计每日23点至次日7点所使用流量"
+        android:title="开启闲时统计" />
+
+    <EditTextPreference
+        android:defaultValue="0"
+        android:inputType="number"
+        android:key="freeflow"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:summary="手动输入闲时流量总量（M）"
+        android:title="闲时流量(M)" />
 
     <ListPreference
+
         android:defaultValue="1"
         android:entries="@array/month_day"
         android:entryValues="@array/month_day"
         android:key="remonth"
+        android:summary="0"
         android:title="每月流量统计起始日期" />
 
 </PreferenceScreen>

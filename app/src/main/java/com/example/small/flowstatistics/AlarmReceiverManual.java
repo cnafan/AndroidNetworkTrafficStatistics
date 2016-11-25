@@ -23,6 +23,7 @@ import static android.content.Context.MODE_PRIVATE;
 import static android.media.AudioManager.RINGER_MODE_SILENT;
 import static android.media.AudioManager.STREAM_RING;
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
+import static com.example.small.flowstatistics.MainActivity.TAG;
 
 /**
  * Created by small on 2016/9/30.
@@ -54,10 +55,12 @@ public class AlarmReceiverManual extends BroadcastReceiver implements SMSBroadca
             dianLiangBR.setInteractionListener(this);
         }
         Calendar calendar = Calendar.getInstance();
-        int cuday = calendar.get(Calendar.DAY_OF_MONTH);
+        int curday = calendar.get(Calendar.DAY_OF_MONTH);
         int curmonth = calendar.get(Calendar.MONTH);
-        if (Objects.equals(Integer.valueOf(pref_default.getString("remonth", "")), cuday) && curmonth != pref.getInt("savemonth", 0)) {
-            editor.putLong("curmonthflow", 0);
+        if (Objects.equals(Integer.valueOf(pref_default.getString("remonth", "")), curday) && curmonth == pref.getInt("savemonth", 0)) {
+            editor.putLong("lastmonthflow",pref.getLong("curmonthflow",0));//上个月使用
+            editor.putLong("curmonthflow", 0);//
+            editor.putInt("savemonth",curmonth);
         }
         CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();
         long todayflow = calculateTodayFlow.calculate(context);
@@ -91,7 +94,7 @@ public class AlarmReceiverManual extends BroadcastReceiver implements SMSBroadca
         editor.putLong("onebootlastdayflow", onebootlastdayflow);
         //editor.putLong("onedaylastbootflow", 0);
         editor.commit();
-        Log.d("qiang", "每日更新广播处理完毕manual");
+        Log.d(TAG, "每日更新广播处理完毕manual");
     }
 
     @Override

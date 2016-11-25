@@ -6,6 +6,7 @@ import android.net.TrafficStats;
 import android.util.Log;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.example.small.flowstatistics.MainActivity.TAG;
 
 /**
  * Created by small on 2016/9/30.
@@ -28,7 +29,7 @@ class CalculateTodayFlow {
         result = thisbootflow + onedaylastbootflow - onebootlastdayflow;
 
         editor.putLong("curdayflow", result);
-        Log.d("qiang", "curdayflow:" + result);
+        Log.d(TAG, "curdayflow:" + result);
         editor.commit();
         return result;
     }
