@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         long curdayflow = pref.getLong("curdayflow", 0);
         long lastmonthflow = pref.getLong("lastmonthflow", 0);
         long curfreetimeflow = pref.getLong("curfreetimeflow", 0);
-        long allfreetimeflow =  new Formatdata().GetNumFromString(pref_default.getString("freeflow", "0"));
+        long allfreetimeflow =  new Formatdata().GetNumFromString(pref_default.getString("freeflow", "0")+ "M");
         String textstr;
         if (pref_default.getBoolean("free", true)) {
             textstr = "本月可用流量（含闲时）：" + new Formatdata().longtostring(all_liuliang) + "\n本月可用闲时流量：" + new Formatdata().longtostring(allfreetimeflow)
