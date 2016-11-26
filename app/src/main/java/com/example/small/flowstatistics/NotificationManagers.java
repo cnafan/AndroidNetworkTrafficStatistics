@@ -54,9 +54,8 @@ class NotificationManagers {
             if (pref_default.getBoolean("free", true)) {
                 Calendar calendar = Calendar.getInstance();
                 int systemTime = calendar.get(Calendar.HOUR_OF_DAY);
-                //Toast.makeText(context,systemTime,Toast.LENGTH_SHORT);
                 if (systemTime > 22 ||systemTime < 7)  {//从23点开始截止到次日7点
-                    notification_string = "本月闲时流量还剩 " + new Formatdata().longtostring(allfreetimeflow-curmonthfreeflow-curfreetimeflow) + " 今日已用闲时" + new Formatdata().longtostring(curfreetimeflow);
+                    notification_string = "本月闲时还剩 " + new Formatdata().longtostring(allfreetimeflow-curmonthfreeflow-curfreetimeflow) + " 今日已用闲时" + new Formatdata().longtostring(curfreetimeflow);
 
                 } else {
                     notification_string = "本月流量还剩 " + new Formatdata().longtostring(remain_liuliang - curmonthflow - curdayflow - allfreetimeflow) + " 今日已用" + new Formatdata().longtostring(curdayflow);

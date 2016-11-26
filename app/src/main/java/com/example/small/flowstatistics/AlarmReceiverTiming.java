@@ -56,8 +56,6 @@ public class AlarmReceiverTiming extends BroadcastReceiver {
 
                 CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();
                 long curdayflow = calculateTodayFlow.calculate(context);
-
-
                 long freetimeflowstart = pref.getLong("freetimeflowstart", 0);
 
                 Calendar calendar= Calendar.getInstance();
@@ -69,7 +67,7 @@ public class AlarmReceiverTiming extends BroadcastReceiver {
 
                 } else if (systemTime < 6) {
                     Log.d(TAG,"07free");
-                    editor.putLong("curfreetimeflow", pref.getLong("freetimeflow", 0) + curdayflow);
+                    editor.putLong("curfreetimeflow", pref.getLong("curfreetimeflow", 0) + curdayflow);
                 }
                 editor.putLong("thisbootflow", thisbootflow);
                 editor.putLong("curdayflow", curdayflow);
