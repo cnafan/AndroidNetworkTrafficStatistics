@@ -72,13 +72,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     + "\n本月已用流量：" + new Formatdata().longtostring(all_liuliang - remain_liuliang)
                     + "\n本月还剩流量：" + new Formatdata().longtostring(remain_liuliang) + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow)
                     + "\n今日使用流量(不含闲时)：" + new Formatdata().longtostring(curdayflow - curfreetimeflow) + "\n今日闲时使用流量：" + new Formatdata().longtostring(curfreetimeflow);
-
         } else {
             textstr = "本月可用流量：" + new Formatdata().longtostring(all_liuliang) + "\n本月已用流量：" + new Formatdata().longtostring(all_liuliang - remain_liuliang)
                     + "\n本月还剩流量：" + new Formatdata().longtostring(remain_liuliang) + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow)
                     + "\n今日使用流量：" + new Formatdata().longtostring(curdayflow);
         }
-
         textView = (TextView) findViewById(R.id.main);
         textView.setText(textstr);
     }
@@ -108,7 +106,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             editor.putLong("curfreetimeflow", 0);//当日闲时流量
             editor.putLong("allfreetimeflow", 0);//闲时流量总量
             editor.putLong("curmonthfreeflow", 0);//当月使用闲时流量
-
             editor.commit();
 
             if (isMIUI()) {
@@ -123,16 +120,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         if (!isMyServiceRunning()) {
-            Intent intent2 = new Intent(this, AlarmManualStart.class);
-            startService(intent2);
-            Intent intent = new Intent(this, AlarmTimingStart.class);
-            //开启Service
-            startService(intent);
+            startService(new Intent(this, AlarmTimingStart.class));
+            startService(new Intent(this, AlarmFreeStart.class));
+            startService(new Intent(this, AlarmManualStart.class));
         }
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

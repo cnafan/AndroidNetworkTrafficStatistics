@@ -46,7 +46,6 @@
         android:title="闲时流量(M)" />
 
     <ListPreference
-
         android:defaultValue="1"
         android:entries="@array/month_day"
         android:entryValues="@array/month_day"

@@ -32,9 +32,9 @@ public class AlarmFreeStart extends Service {
 
         Log.d(TAG, "AlarmFreeStart已开启");
         SharedPreferences pref_default = getDefaultSharedPreferences(this);
-        if (pref_default.getBoolean("ShowNotification", true)) {
+        if (pref_default.getBoolean("free", true)) {
 
-            Intent intent1 = new Intent(this, AlarmReceiverManual.class); //触发广播，广播回调此方法，实现循环
+            Intent intent1 = new Intent(this, AlarmReceiverFree.class); //触发广播，广播回调此方法，实现循环
             PendingIntent pendingIntent2 = PendingIntent.getBroadcast(this, 1, intent1, PendingIntent.FLAG_UPDATE_CURRENT);
             long firstTime = SystemClock.elapsedRealtime();    // 开机之后到现在的运行时间(包括睡眠时间)
             long systemTime = System.currentTimeMillis();

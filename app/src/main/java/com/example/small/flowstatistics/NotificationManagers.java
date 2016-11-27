@@ -21,7 +21,6 @@ class NotificationManagers {
 
     void showNotificationRough() {
 
-
     }
 
     void showNotificationPrecise(Context context, long curdayflow) {
