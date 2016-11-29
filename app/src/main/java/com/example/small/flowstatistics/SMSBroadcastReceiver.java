@@ -16,7 +16,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
     private Interaction interaction;
 
     public interface Interaction {
-        void setTexts(Context context, String content, String content1);
+        void setTexts(Context context, String[] content);
     }
 
     public void setInteractionListener(Interaction interaction) {
@@ -54,7 +54,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
                 String[] fin = re_10086.calculate(context, sb.toString());
 
                 context.unregisterReceiver(this);
-                interaction.setTexts(context, fin[0], fin[1]);
+                interaction.setTexts(context, fin);
             } else {
                 //Toast.makeText(context, sb, Toast.LENGTH_LONG).show();
                 //System.out.println("发送人：" + phoneNum + "  短信内容：" + sb.toString());

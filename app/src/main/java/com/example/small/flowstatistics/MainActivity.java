@@ -60,18 +60,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
+
         long remain_liuliang = pref.getLong("remain_liuliang", 0);
         long all_liuliang = pref.getLong("all_liuliang", 0);
         long curdayflow = pref.getLong("curdayflow", 0);
         long lastmonthflow = pref.getLong("lastmonthflow", 0);
         long curfreetimeflow = pref.getLong("curfreetimeflow", 0);
-        long allfreetimeflow =  new Formatdata().GetNumFromString(pref_default.getString("freeflow", "0")+ "M");
+        long curfreefront=pref.getLong("curfreefront",0);
+        long curfreebehind=pref.getLong("curfreebehind",0);
+        long allfreetimeflow = new Formatdata().GetNumFromString(pref_default.getString("freeflow", "0") + "M");
         String textstr;
         if (pref_default.getBoolean("free", true)) {
             textstr = "本月可用流量（含闲时）：" + new Formatdata().longtostring(all_liuliang) + "\n本月可用闲时流量：" + new Formatdata().longtostring(allfreetimeflow)
                     + "\n本月已用流量：" + new Formatdata().longtostring(all_liuliang - remain_liuliang)
                     + "\n本月还剩流量：" + new Formatdata().longtostring(remain_liuliang) + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow)
-                    + "\n今日使用流量(不含闲时)：" + new Formatdata().longtostring(curdayflow - curfreetimeflow) + "\n今日闲时使用流量：" + new Formatdata().longtostring(curfreetimeflow);
+                    + "\n今日使用流量(不含闲时)：" + new Formatdata().longtostring(curdayflow - curfreebehind-curfreefront) + "\n今日闲时使用流量：" + new Formatdata().longtostring(curfreetimeflow);
         } else {
             textstr = "本月可用流量：" + new Formatdata().longtostring(all_liuliang) + "\n本月已用流量：" + new Formatdata().longtostring(all_liuliang - remain_liuliang)
                     + "\n本月还剩流量：" + new Formatdata().longtostring(remain_liuliang) + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow)
@@ -262,7 +265,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void setTexts(Context context, String content, String content1) {
+    public void setTexts(Context context, String[] content) {
         //delay();
         try {
             Log.d("qiang", "delay");
@@ -272,16 +275,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             e.printStackTrace();
         }
         recovery();
-        if (content != null && content1 != null) {
+        if (content[1] != null && content[0] != null) {
             progressDialog.dismiss();
             editor.putLong("curmonthflow", 0);
-            editor.putLong("remain_liuliang", new Formatdata().GetNumFromString(content));
-            editor.putLong("all_liuliang", new Formatdata().GetNumFromString(content1));
+            editor.putLong("remain_liuliang", new Formatdata().GetNumFromString(content[0]));
+            editor.putLong("all_liuliang", new Formatdata().GetNumFromString(content[1]));
             editor.commit();
 
             CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();
             long todayflow = calculateTodayFlow.calculate(context);
-            //show_notifiction(this, todayflow);
             new NotificationManagers().showNotificationPrecise(context, todayflow);
         } else {
             Toast.makeText(this, "查询失败-.-", Toast.LENGTH_LONG).show();

@@ -67,7 +67,7 @@ public class AlarmReceiverTiming extends BroadcastReceiver {
 
                 } else if (systemTime < 6) {
                     Log.d(TAG,"07free");
-                    editor.putLong("curfreetimeflow", pref.getLong("curfreetimeflow", 0) + curdayflow);
+                    editor.putLong("curfreefront", curdayflow);
                 }
                 editor.putLong("thisbootflow", thisbootflow);
                 editor.putLong("curdayflow", curdayflow);

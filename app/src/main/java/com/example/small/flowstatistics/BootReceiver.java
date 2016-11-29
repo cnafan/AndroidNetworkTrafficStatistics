@@ -24,9 +24,7 @@ public class BootReceiver extends BroadcastReceiver {
             SharedPreferences.Editor editor = context.getSharedPreferences("data", MODE_PRIVATE).edit();
             SharedPreferences pref = context.getSharedPreferences("data", MODE_PRIVATE);
             long curdayflow = pref.getLong("curdayflow", 0);//4
-
             new NotificationManagers().showNotificationPrecise(context,curdayflow);
-            //show_notifiction(context, curdayflow);
         }
     }
 

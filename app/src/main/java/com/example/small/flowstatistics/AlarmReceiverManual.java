@@ -96,30 +96,29 @@ public class AlarmReceiverManual extends BroadcastReceiver implements SMSBroadca
         editor.commit();
         Log.d(TAG, "每日更新广播处理完毕manual");
     }
-
     @Override
-    public void setTexts(Context context, String content, String content1) {
+    public void setTexts(Context context, String[] content) {
         //delay();
         try {
-            //Log.d("qiang", "delay");
+            Log.d("qiang", "delay");
             Thread.currentThread();
             Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
         recovery(context);
-        if (content != null && content1 != null) {
+        if (content[1] != null && content[0] != null) {
             SharedPreferences.Editor editor = context.getSharedPreferences("data", MODE_PRIVATE).edit();
-            editor.putLong("remain_liuliang", new Formatdata().GetNumFromString(content));
-            editor.putLong("all_liuliang", new Formatdata().GetNumFromString(content1));
             editor.putLong("curmonthflow", 0);
+            editor.putLong("remain_liuliang", new Formatdata().GetNumFromString(content[0]));
+            editor.putLong("all_liuliang", new Formatdata().GetNumFromString(content[1]));
+            editor.putLong("curfreebehind",0);
+            editor.putLong("curfreefront",0);
             editor.commit();
 
             CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();
             long todayflow = calculateTodayFlow.calculate(context);
-            //show_notifiction(context, todayflow);
-            new NotificationManagers().showNotificationPrecise(context,todayflow);
+            new NotificationManagers().showNotificationPrecise(context, todayflow);
         } else {
             Toast.makeText(context, "查询失败-.-", Toast.LENGTH_LONG).show();
         }
