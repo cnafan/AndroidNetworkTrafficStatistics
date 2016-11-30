@@ -66,15 +66,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         long curdayflow = pref.getLong("curdayflow", 0);
         long lastmonthflow = pref.getLong("lastmonthflow", 0);
         long curfreetimeflow = pref.getLong("curfreetimeflow", 0);
-        long curfreefront=pref.getLong("curfreefront",0);
-        long curfreebehind=pref.getLong("curfreebehind",0);
-        long allfreetimeflow = new Formatdata().GetNumFromString(pref_default.getString("freeflow", "0") + "M");
+        long curfreefront = pref.getLong("curfreefront", 0);
+        long curfreebehind = pref.getLong("curfreebehind", 0);
+
+
         String textstr;
-        if (pref_default.getBoolean("free", true)) {
+        if (pref_default.getBoolean("free", false)) {
+            long allfreetimeflow = new Formatdata().GetNumFromString(pref_default.getString("freeflow", "0") + "M");
             textstr = "本月可用流量（含闲时）：" + new Formatdata().longtostring(all_liuliang) + "\n本月可用闲时流量：" + new Formatdata().longtostring(allfreetimeflow)
                     + "\n本月已用流量：" + new Formatdata().longtostring(all_liuliang - remain_liuliang)
                     + "\n本月还剩流量：" + new Formatdata().longtostring(remain_liuliang) + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow)
-                    + "\n今日使用流量(不含闲时)：" + new Formatdata().longtostring(curdayflow - curfreebehind-curfreefront) + "\n今日闲时使用流量：" + new Formatdata().longtostring(curfreetimeflow);
+                    + "\n今日使用流量(不含闲时)：" + new Formatdata().longtostring(curdayflow - curfreebehind - curfreefront) + "\n今日闲时使用流量：" + new Formatdata().longtostring(curfreetimeflow);
         } else {
             textstr = "本月可用流量：" + new Formatdata().longtostring(all_liuliang) + "\n本月已用流量：" + new Formatdata().longtostring(all_liuliang - remain_liuliang)
                     + "\n本月还剩流量：" + new Formatdata().longtostring(remain_liuliang) + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow)

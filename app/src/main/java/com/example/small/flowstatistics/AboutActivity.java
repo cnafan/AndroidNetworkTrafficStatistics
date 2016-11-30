@@ -12,21 +12,18 @@ import java.util.Calendar;
 
 public class AboutActivity extends AppCompatActivity {
 
+    private Toolbar toolbar;
+
     LinearLayout root;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
 
-        Toolbar bar = (Toolbar) findViewById(R.id.toolbars);
-        // App Logo
-        bar.setLogo(R.mipmap.ic_launcher);
-        // Title
-        bar.setTitle("关于");
-        // Sub Title
-        bar.setSubtitle("Sub title");
-        setSupportActionBar(bar);
-        bar.setNavigationOnClickListener(new View.OnClickListener() {
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
