@@ -71,6 +71,9 @@ public class AlarmReceiverTiming extends BroadcastReceiver {
                 }
                 editor.putLong("thisbootflow", thisbootflow);
                 editor.putLong("curdayflow", curdayflow);
+
+                editor.putLong(String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)), pref.getLong("curdayflow",0));
+
                 editor.commit();
 
                 new NotificationManagers().showNotificationPrecise(context, curdayflow);

@@ -12,6 +12,15 @@ import java.util.regex.Pattern;
 
  class Formatdata {
 
+    float  longtolong(long data){
+
+        double bytes = data / 1024.0;
+        return (float)(bytes / 1024.0);
+    }
+    float longtofloat(long data){
+        double bytes = data / 1024.0;
+        return (float) (bytes / 1024.0);
+    }
     String longtostring(long data) {
         DecimalFormat df = new DecimalFormat("#.##");
         double bytes = data / 1024.0;

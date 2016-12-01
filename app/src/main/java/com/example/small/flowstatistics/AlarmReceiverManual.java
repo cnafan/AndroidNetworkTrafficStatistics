@@ -55,6 +55,7 @@ public class AlarmReceiverManual extends BroadcastReceiver implements SMSBroadca
             dianLiangBR.setInteractionListener(this);
         }
         Calendar calendar = Calendar.getInstance();
+
         int curday = calendar.get(Calendar.DAY_OF_MONTH);
         int curmonth = calendar.get(Calendar.MONTH);
         if (Objects.equals(Integer.valueOf(pref_default.getString("remonth", "")), curday) && curmonth == pref.getInt("savemonth", 0)) {
@@ -93,6 +94,8 @@ public class AlarmReceiverManual extends BroadcastReceiver implements SMSBroadca
         onebootlastdayflow = thisbootflow + onedaylastbootflow;
         editor.putLong("onebootlastdayflow", onebootlastdayflow);
         //editor.putLong("onedaylastbootflow", 0);
+
+
         editor.commit();
         Log.d(TAG, "每日更新广播处理完毕manual");
     }
