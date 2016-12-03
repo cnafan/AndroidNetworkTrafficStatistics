@@ -5,6 +5,7 @@ import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -31,6 +32,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,7 +41,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
-import lecho.lib.hellocharts.animation.ChartAnimationListener;
 import lecho.lib.hellocharts.listener.LineChartOnValueSelectListener;
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
@@ -60,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public AudioManager audio;
     public int mode;
 
+    public Button eachmonth;
+    public Button eachday;
     public TextView textView;
     private ProgressDialog progressDialog;
     public FloatingActionButton fab;
@@ -99,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         textView = (TextView) findViewById(R.id.main);
         textView.setText(textstr);
+
     }
 
     @Override
@@ -128,19 +132,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             editor.putLong("allfreetimeflow", 0);//闲时流量总量
             editor.putLong("curmonthfreeflow", 0);//当月使用闲时流量
             editor.commit();
-
-            /*
-            if (isMIUI()) {
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-                alertDialog.setMessage("检测到您的手机为MIUI系统，软件正常运行需要申请权限，现跳转至权限管理界面");
-                alertDialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        gotoPermissionSettings(MainActivity.this);
-                    }
-                });
-            }
-            */
         }
         if (!isMyServiceRunning()) {
             startService(new Intent(this, AlarmTimingStart.class));
@@ -155,50 +146,62 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         lineChart.setOnValueTouchListener(new LineChartOnValueSelectListener() {
             @Override
             public void onValueSelected(int lineIndex, int pointIndex, PointValue value) {
-                Toast.makeText(MainActivity.this, "", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MainActivity.this, "", Toast.LENGTH_SHORT).show();
                 //addLineToData();
                 //resetViewport();
             }
 
             @Override
             public void onValueDeselected() {
-
             }
         });
-        //lineChart.setValueSelectionEnabled(false);//设置节点点击后动画
-        //toggleCubic();
-        AddLineChartDate();
-        //float[]  = {33.0f, 33.4f, 33.2f, 33.4f, 33.0f, 33.4f, 33.2f, 33.4f, 33.0f, 33.4f, 33.2f, 33.4f, 33.0f, 33.4f, 33.2f, 33.4f, 33.0f, 33.4f, 33.2f, 33.4f, 33.0f, 33.4f, 33.2f, 33.4f, 33.0f, 33.4f, 33.2f, 33.4f, 33.0f, 33.4f, 33.2f};
+        AddLineChartDate(0);//本月
+
+
+        eachday = (Button) findViewById(R.id.eachday);
+        eachday.setOnClickListener(this);
+        eachmonth = (Button) findViewById(R.id.eachmonth);
+        eachmonth.setOnClickListener(this);
     }
 
     /**
      * 添加数据
      */
 
-    static int LineChartNums = 31;
+    static int LineChartEachMonthNums = 31;
+    static int LineChartEachDayNums = 24;
     int numberOfLines = 1;
     int maxNumberOfLines = 4;
     boolean isCubic = false;
 
     LineChartView lineChart;
-
     private LineChartData chartData;
 
-    public void AddLineChartDate() {
+    public void AddLineChartDate(int type) {
 
         List<Line> lines = new ArrayList<Line>();
         for (int i = 0; i < numberOfLines; i++) {
             List<PointValue> pointValues = new ArrayList<PointValue>();//节点数据结合
             Axis axisY = new Axis();//Y轴属性
             Axis axisX = new Axis();//X轴属性
-            //axisY.setName("Y轴");
-            //axisX.setName("X轴");
+            //
+            //axis.setName("X轴");
             ArrayList<AxisValue> axisValuesY = new ArrayList<AxisValue>();
             ArrayList<AxisValue> axisValuesX = new ArrayList<AxisValue>();
-            for (int j = 0; j < LineChartNums; j++) {
-                pointValues.add(new PointValue(j,new Formatdata().longtofloat(pref.getLong(j+1+"",0))));//添加节点数据
-                //axisValuesY.add(new AxisValue(j * 10 * (i + 1)).setLabel(j + ""));//添加Y轴显示的刻度值
-                axisValuesX.add(new AxisValue(j).setLabel(j+1 + ""));//添加X轴显示的刻度值
+            if (type == 0) {//本月
+                pointValues.clear();
+                for (int j = 0; j < LineChartEachMonthNums; j++) {
+                    pointValues.add(new PointValue(j, new Formatdata().longtofloat(pref.getLong(j + 1 + "", 0))));//添加节点数据
+                    //axisValuesY.add(new AxisValue(j * 10 * (i + 1)).setLabel(j + ""));//添加Y轴显示的刻度值
+                    axisValuesX.add(new AxisValue(j).setLabel(j + 1 + "日"));//添加X轴显示的刻度值
+                }
+            } else if (type == 1) {
+                pointValues.clear();
+                for (int j = 0; j < LineChartEachDayNums; j++) {
+                    pointValues.add(new PointValue(j, 0.1f));//添加节点数据//new Formatdata().longtofloat(pref.getLong(j + 1 + ""
+                    //axisValuesY.add(new AxisValue(j * 10 * (i + 1)).setLabel(j + ""));//添加Y轴显示的刻度值
+                    axisValuesX.add(new AxisValue(j).setLabel(j + 1 + ":00"));//添加X轴显示的刻度值
+                }
             }
             axisY.setValues(axisValuesY);
             axisX.setValues(axisValuesX);
@@ -216,7 +219,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             axisX.setInside(false);//设置X轴文字在X轴内部
             //axisX.setMaxLabelChars(9); //最多几个X轴坐标，意思就是你的缩放让X轴上数据的个数7<=x<=mAxisXValues.length
 
-
             Line line = new Line(pointValues);
             line.setColor(Color.parseColor("#b6ddfb"));//设置折线颜色
             line.setStrokeWidth(5);//设置折线宽度
@@ -231,7 +233,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             line.setShape(ValueShape.CIRCLE);//节点图形样式 DIAMOND菱形、SQUARE方形、CIRCLE圆形
             line.setHasLabelsOnlyForSelected(false);//隐藏数据，触摸可以显示
 
-
             lines.add(line);//将数据集合添加到线
 
             chartData = new LineChartData(lines);
@@ -245,130 +246,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             chartData.setValueLabelTextSize(10);//设置数据文字大小
             chartData.setValueLabelTypeface(Typeface.MONOSPACE);//设置数据文字样式
         }
-        //lineChart.setInteractive(true);
+        lineChart.setInteractive(true);
         //lineChart.setZoomType(ZoomType.HORIZONTAL);
         //lineChart.setVisibility(View.VISIBLE);
         lineChart.setLineChartData(chartData);//将数据添加到控件中
-        //lineChart.setMaxZoom((float) 2);//最大方法比例
-        Viewport tempViewport = new Viewport(0, lineChart.getMaximumViewport().height()*1.4f, 9, 0) ;//调整y轴,使图标上部有留白:
+        Viewport tempViewport = new Viewport(0, lineChart.getMaximumViewport().height() * 1.4f, 9, 0);//调整y轴,使图标上部有留白:
         lineChart.setCurrentViewport(tempViewport);//left：0//X轴为0   top:chart.getMaximumViewport()//Y轴的最大值right: 9//X轴显示9列 bottom：0//Y轴为0
     }
 
-    private void resetViewport() {
-        // Reset viewport height range to (0,100)
-        final Viewport v = new Viewport(lineChart.getMaximumViewport());
-        v.bottom = 0;
-        v.top = 100;
-        v.left = 0;
-        v.right = LineChartNums - 1;
-        lineChart.setMaximumViewport(v);
-        lineChart.setCurrentViewport(v);
-    }
-
-    private void toggleCubic() {
-        isCubic = !isCubic;
-
-        if (isCubic) {
-            final Viewport v = new Viewport(lineChart.getMaximumViewport());
-            v.bottom = -5;
-            v.top = 105;
-            lineChart.setMaximumViewport(v);
-            lineChart.setCurrentViewportWithAnimation(v);
-        } else {
-            // If not cubic restore viewport to (0,100) range.
-            final Viewport v = new Viewport(lineChart.getMaximumViewport());
-            v.bottom = 0;
-            v.top = 100;
-            lineChart.setViewportAnimationListener(new ChartAnimationListener() {
-                @Override
-                public void onAnimationStarted() {
-                    // TODO Auto-generated method stub
-                }
-                @Override
-                public void onAnimationFinished() {
-                    lineChart.setMaximumViewport(v);
-                    lineChart.setViewportAnimationListener(null);
-                }
-            });
-            lineChart.setCurrentViewportWithAnimation(v);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        Log.d(TAG, "requestCode:" + requestCode);
-        switch (requestCode) {
-            case 1:
-                Log.d("qiang", "grantResults:" + grantResults[0]);
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Permission Granted
-                    progressDialog = new ProgressDialog(MainActivity.this);
-                    progressDialog.setMessage("查询中...");
-                    progressDialog.setCancelable(true);
-                    progressDialog.show();
-                    Sendmessage sendmessage = new Sendmessage();
-                    sendmessage.Sendmessages();
-                    //静音
-                    sendmessage.silent();
-                    Log.d("qiang", "发送成功");
-                } else {
-                    // Permission Denied
-                    Toast.makeText(MainActivity.this, "接受短信权限已关闭", Toast.LENGTH_SHORT)
-                            .show();
-                    Log.d("qiang", "接受短信权限已关闭");
-                }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.action_settings:
-                Intent settingintent = new Intent(MainActivity.this, SettingActivity.class);
-                startActivity(settingintent);
-                break;
-            case R.id.log:
-                final AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(this);
-                alertDialog2.setTitle("log");
-                String logstr = new FileManager().readLogFile(this);
-                alertDialog2.setMessage(logstr);
-                alertDialog2.setPositiveButton("OK", null);
-                alertDialog2.show();
-                break;
-            case R.id.help:
-                final AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-                alertDialog.setTitle("帮助");
-                String helpmessage = "1.点击查询按钮是请务必在开启数据且关闭wifi后。" +
-                        "\n2.使用校正功能后请点击查询按钮导入设置。";
-                alertDialog.setMessage(helpmessage);
-                alertDialog.setPositiveButton("OK", null);
-                alertDialog.show();
-                break;
-            case R.id.about_activity:
-                startActivity(new Intent(MainActivity.this, AboutActivity.class));
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.eachmonth:
+                AddLineChartDate(0);//本月
+                break;
+            case R.id.eachday:
+                AddLineChartDate(1);//本日
+                break;
             case R.id.fab:
                 ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
                 NetworkInfo mobileInfo = manager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
@@ -422,6 +317,92 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(this, "请关闭wifi并打开数据开关后查询", Toast.LENGTH_SHORT).show();
                 }
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.d(TAG, "requestCode:" + requestCode);
+        switch (requestCode) {
+            case 1:
+                Log.d("qiang", "grantResults:" + grantResults[0]);
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission Granted
+                    progressDialog = new ProgressDialog(MainActivity.this);
+                    progressDialog.setMessage("查询中...");
+                    progressDialog.setCancelable(true);
+                    progressDialog.show();
+                    Sendmessage sendmessage = new Sendmessage();
+                    sendmessage.Sendmessages();
+                    //静音
+                    sendmessage.silent();
+                    Log.d("qiang", "发送成功");
+                } else {
+                    // Permission Denied
+                    Toast.makeText(MainActivity.this, "接受短信权限已关闭", Toast.LENGTH_SHORT)
+                            .show();
+                    Log.d("qiang", "接受短信权限已关闭");
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_settings:
+                Intent settingintent = new Intent(MainActivity.this, SettingActivity.class);
+                startActivity(settingintent);
+                break;
+            case R.id.log:
+                final AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(this);
+                if (pref_default.getBoolean("log", false)) {
+                    alertDialog2.setTitle("log");
+                    String logstr = new FileManager().readLogFile(this);
+                    alertDialog2.setMessage(logstr);
+                    alertDialog2.setPositiveButton("OK", null);
+                    alertDialog2.show();
+                }
+                else {
+                    alertDialog2.setTitle("log");
+                    alertDialog2.setMessage("未开启日志记录功能，是否开启日志记录功能？");
+                    alertDialog2.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            startActivity(new Intent(MainActivity.this,SettingActivity.class));
+                        }
+                    });
+                    alertDialog2.setNegativeButton("Cancel",null);
+                    alertDialog2.show();
+                }
+                break;
+            case R.id.help:
+                final AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+                alertDialog.setTitle("帮助");
+                String helpmessage = "1.点击查询按钮是请务必在开启数据且关闭wifi后。" +
+                        "\n2.使用校正功能后请点击查询按钮导入设置。";
+                alertDialog.setMessage(helpmessage);
+                alertDialog.setPositiveButton("OK", null);
+                alertDialog.show();
+                break;
+            case R.id.about_activity:
+                startActivity(new Intent(MainActivity.this, AboutActivity.class));
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -549,3 +530,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 }
+/*
+    private void resetViewport() {
+        // Reset viewport height range to (0,100)
+        final Viewport v = new Viewport(lineChart.getMaximumViewport());
+        v.bottom = 0;
+        v.top = 100;
+        v.left = 0;
+        v.right = LineChartNums - 1;
+        lineChart.setMaximumViewport(v);
+        lineChart.setCurrentViewport(v);
+    }
+
+    private void toggleCubic() {
+        isCubic = !isCubic;
+
+        if (isCubic) {
+            final Viewport v = new Viewport(lineChart.getMaximumViewport());
+            v.bottom = -5;
+            v.top = 105;
+            lineChart.setMaximumViewport(v);
+            lineChart.setCurrentViewportWithAnimation(v);
+        } else {
+            // If not cubic restore viewport to (0,100) range.
+            final Viewport v = new Viewport(lineChart.getMaximumViewport());
+            v.bottom = 0;
+            v.top = 100;
+            lineChart.setViewportAnimationListener(new ChartAnimationListener() {
+                @Override
+                public void onAnimationStarted() {
+                    // TODO Auto-generated method stub
+                }
+                @Override
+                public void onAnimationFinished() {
+                    lineChart.setMaximumViewport(v);
+                    lineChart.setViewportAnimationListener(null);
+                }
+            });
+            lineChart.setCurrentViewportWithAnimation(v);
+        }
+    }
+*/

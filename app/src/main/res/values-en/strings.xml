@@ -6,11 +6,22 @@
     <string name="phone">10086</string>
     <string name="message_search">CXLL</string>
     <string name="help">help</string>
+    <string name="version">current version:2.0.1</string>
+    <string name="opensourcetitle">thanks</string>
+    <string name="updatelogtitle">update</string>
+    <string name="opensource">感谢开源世界，让我们能在巨人的肩膀上看的更远</string>
+    <string-array name="opensourceproject">
+        <item>lecho/hellocharts-android</item>
+    </string-array>
 
     <string-array name="list_preference_entries">
         <item>Entry 1</item>
         <item>Entry 2</item>
         <item>Entry 3</item>
+    </string-array>
+    <string-array name="updatelog">
+        <item>1.0\n1.新增闲时统计功能\n2.新增通知管理</item>
+        <item>2.0\n1.新增可视化图表\n2.修复已知问题</item>
     </string-array>
 
     <string-array name="month_day">
@@ -47,4 +58,6 @@
         <item>31</item>
     </string-array>
 
+    <string name="eachmonth">每月使用情况</string>
+    <string name="eachday">每日使用情况</string>
 </resources>
