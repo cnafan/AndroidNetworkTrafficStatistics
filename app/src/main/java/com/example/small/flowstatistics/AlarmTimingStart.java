@@ -14,6 +14,12 @@ import android.util.Log;
  */
 
 public class AlarmTimingStart extends Service {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {

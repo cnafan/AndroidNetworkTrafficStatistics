@@ -63,7 +63,7 @@ public class AlarmReceiverTiming extends BroadcastReceiver {
                 //Toast.makeText(context,systemTime,Toast.LENGTH_SHORT);
                 if (systemTime > 22) {//从23点开始截止到次日7点
                     Log.d(TAG,"23free");
-                    editor.putLong("curfreetimeflow", curdayflow - freetimeflowstart);
+                    editor.putLong("curfreebehind", curdayflow - freetimeflowstart);
 
                 } else if (systemTime < 6) {
                     Log.d(TAG,"07free");

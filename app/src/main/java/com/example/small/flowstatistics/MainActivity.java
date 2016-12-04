@@ -41,6 +41,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
+import lecho.lib.hellocharts.gesture.ContainerScrollType;
 import lecho.lib.hellocharts.listener.LineChartOnValueSelectListener;
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public FloatingActionButton fab;
     private static final int REQUEST_CODE = 1;
     private static final int RECEIVE_SMS_REQUEST_CODE = 2;
+    public static int FLAG = 1;
 
     public SharedPreferences pref_default;
     public SharedPreferences.Editor editor;
@@ -100,9 +102,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     + "\n本月还剩流量：" + new Formatdata().longtostring(remain_liuliang) + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow)
                     + "\n今日使用流量：" + new Formatdata().longtostring(curdayflow);
         }
+
         textView = (TextView) findViewById(R.id.main);
         textView.setText(textstr);
-
     }
 
     @Override
@@ -142,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fab.setOnClickListener(this);
 
         lineChart = (LineChartView) findViewById(R.id.linechart);
-        lineChart.setInteractive(true);//是否可以缩放
+
         lineChart.setOnValueTouchListener(new LineChartOnValueSelectListener() {
             @Override
             public void onValueSelected(int lineIndex, int pointIndex, PointValue value) {
@@ -209,10 +211,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             axisY.setLineColor(Color.BLACK);//无效果
             axisX.setTextColor(Color.BLACK);//设置X轴文字颜色
             axisY.setTextColor(Color.BLACK);//设置Y轴文字颜色
-
             axisX.setTextSize(10);//设置X轴文字大小
             axisX.setTypeface(Typeface.SERIF);//设置文字样式
-
             axisX.setHasTiltedLabels(false);//设置X轴文字向左旋转45度
             axisX.setHasLines(false);//是否显示X轴网格线
             axisY.setHasLines(false);
@@ -246,12 +246,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             chartData.setValueLabelTextSize(10);//设置数据文字大小
             chartData.setValueLabelTypeface(Typeface.MONOSPACE);//设置数据文字样式
         }
+        lineChart.setLineChartData(chartData);//将数据添加到控件中
         lineChart.setInteractive(true);
         //lineChart.setZoomType(ZoomType.HORIZONTAL);
-        //lineChart.setVisibility(View.VISIBLE);
-        lineChart.setLineChartData(chartData);//将数据添加到控件中
+        lineChart.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
+        lineChart.setVisibility(View.VISIBLE);
         Viewport tempViewport = new Viewport(0, lineChart.getMaximumViewport().height() * 1.4f, 9, 0);//调整y轴,使图标上部有留白:
         lineChart.setCurrentViewport(tempViewport);//left：0//X轴为0   top:chart.getMaximumViewport()//Y轴的最大值right: 9//X轴显示9列 bottom：0//Y轴为0
+
     }
 
 
@@ -374,17 +376,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     alertDialog2.setMessage(logstr);
                     alertDialog2.setPositiveButton("OK", null);
                     alertDialog2.show();
-                }
-                else {
+                } else {
                     alertDialog2.setTitle("log");
                     alertDialog2.setMessage("未开启日志记录功能，是否开启日志记录功能？");
                     alertDialog2.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            startActivity(new Intent(MainActivity.this,SettingActivity.class));
+                            startActivity(new Intent(MainActivity.this, SettingActivity.class));
                         }
                     });
-                    alertDialog2.setNegativeButton("Cancel",null);
+                    alertDialog2.setNegativeButton("Cancel", null);
                     alertDialog2.show();
                 }
                 break;
@@ -429,19 +430,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             Toast.makeText(this, "查询失败-.-", Toast.LENGTH_LONG).show();
         }
+
+        long remain_liuliang = pref.getLong("remain_liuliang", 0);
+        long all_liuliang = pref.getLong("all_liuliang", 0);
+        long curdayflow = pref.getLong("curdayflow", 0);
+        long lastmonthflow = pref.getLong("lastmonthflow", 0);
+        long curfreetimeflow = pref.getLong("curfreetimeflow", 0);
+        long curfreefront = pref.getLong("curfreefront", 0);
+        long curfreebehind = pref.getLong("curfreebehind", 0);
+
+        String textstr;
+        if (pref_default.getBoolean("free", false)) {
+            long allfreetimeflow = new Formatdata().GetNumFromString(pref_default.getString("freeflow", "0") + "M");
+            textstr = "本月可用流量（含闲时）：" + new Formatdata().longtostring(all_liuliang) + "\n本月可用闲时流量：" + new Formatdata().longtostring(allfreetimeflow)
+                    + "\n本月已用流量：" + new Formatdata().longtostring(all_liuliang - remain_liuliang)
+                    + "\n本月还剩流量：" + new Formatdata().longtostring(remain_liuliang) + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow)
+                    + "\n今日使用流量(不含闲时)：" + new Formatdata().longtostring(curdayflow - curfreebehind - curfreefront) + "\n今日闲时使用流量：" + new Formatdata().longtostring(curfreetimeflow);
+        } else {
+            textstr = "本月可用流量：" + new Formatdata().longtostring(all_liuliang) + "\n本月已用流量：" + new Formatdata().longtostring(all_liuliang - remain_liuliang)
+                    + "\n本月还剩流量：" + new Formatdata().longtostring(remain_liuliang) + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow)
+                    + "\n今日使用流量：" + new Formatdata().longtostring(curdayflow);
+        }
+        textView.setText(textstr);
     }
 
-    /* 检查手机是否是miui
+    /* 检查手机是否是xiaomi
             * @ref http://dev.xiaomi.com/doc/p=254/index.html
             * @return
             */
-
-    /**
-     * 检查手机是否是miui
-     *
-     * @return
-     * @ref http://dev.xiaomi.com/doc/p=254/index.html
-     */
     public static boolean isMIUI() {
         String device = Build.MANUFACTURER;
         System.out.println("Build.MANUFACTURER = " + device);
