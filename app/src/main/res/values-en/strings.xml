@@ -11,7 +11,7 @@
     <string name="updatelogtitle">update</string>
     <string name="opensource">感谢开源世界，让我们能在巨人的肩膀上看的更远</string>
     <string-array name="opensourceproject">
-        <item>lecho/hellocharts-android</item>
+        <item>\t\t\t·lecho/hellocharts-android</item>
     </string-array>
 
     <string-array name="list_preference_entries">
@@ -20,8 +20,8 @@
         <item>Entry 3</item>
     </string-array>
     <string-array name="updatelog">
-        <item>1.0\n1.新增闲时统计功能\n2.新增通知管理</item>
-        <item>2.0\n1.新增可视化图表\n2.修复已知问题</item>
+        <item>1.0\n\t\t\t1.新增闲时统计功能\n\t\t\t2.新增通知管理</item>
+        <item>2.0\n\t\t\t1.新增可视化图表\n\t\t\t2.修复已知问题</item>
     </string-array>
 
     <string-array name="month_day">

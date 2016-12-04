@@ -144,7 +144,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fab.setOnClickListener(this);
 
         lineChart = (LineChartView) findViewById(R.id.linechart);
-
         lineChart.setOnValueTouchListener(new LineChartOnValueSelectListener() {
             @Override
             public void onValueSelected(int lineIndex, int pointIndex, PointValue value) {
@@ -158,12 +157,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         AddLineChartDate(0);//本月
+        //AddLineChartDate(1);//本月
 
 
         eachday = (Button) findViewById(R.id.eachday);
         eachday.setOnClickListener(this);
         eachmonth = (Button) findViewById(R.id.eachmonth);
         eachmonth.setOnClickListener(this);
+
     }
 
     /**
@@ -177,49 +178,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     boolean isCubic = false;
 
     LineChartView lineChart;
-    private LineChartData chartData;
+    LineChartData chartData;
 
-    public void AddLineChartDate(int type) {
-
+    private void AddLineChartDate(int type) {
+        int numberOfPoints;
+        ArrayList<AxisValue> axisValuesY = new ArrayList<AxisValue>();
+        ArrayList<AxisValue> axisValuesX = new ArrayList<AxisValue>();
         List<Line> lines = new ArrayList<Line>();
-        for (int i = 0; i < numberOfLines; i++) {
-            List<PointValue> pointValues = new ArrayList<PointValue>();//节点数据结合
-            Axis axisY = new Axis();//Y轴属性
-            Axis axisX = new Axis();//X轴属性
-            //
-            //axis.setName("X轴");
-            ArrayList<AxisValue> axisValuesY = new ArrayList<AxisValue>();
-            ArrayList<AxisValue> axisValuesX = new ArrayList<AxisValue>();
-            if (type == 0) {//本月
-                pointValues.clear();
-                for (int j = 0; j < LineChartEachMonthNums; j++) {
-                    pointValues.add(new PointValue(j, new Formatdata().longtofloat(pref.getLong(j + 1 + "", 0))));//添加节点数据
+
+        Axis axisY = new Axis();//Y轴属性
+        Axis axisX = new Axis();//X轴属性
+
+        if (type == 0)
+            numberOfPoints = LineChartEachMonthNums;
+        else
+            numberOfPoints = LineChartEachDayNums;
+        for (int i = 0; i < numberOfLines; ++i) {
+            List<PointValue> values = new ArrayList<PointValue>();
+
+            if (type == 0) {
+                values.clear();
+                axisValuesY.clear();
+                axisValuesX.clear();
+                for (int j = 0; j < numberOfPoints; ++j) {
+                    values.add(new PointValue(j, new Formatdata().longtofloat(pref.getLong(j + 1 + "", 0))));
                     //axisValuesY.add(new AxisValue(j * 10 * (i + 1)).setLabel(j + ""));//添加Y轴显示的刻度值
                     axisValuesX.add(new AxisValue(j).setLabel(j + 1 + "日"));//添加X轴显示的刻度值
                 }
-            } else if (type == 1) {
-                pointValues.clear();
-                for (int j = 0; j < LineChartEachDayNums; j++) {
-                    pointValues.add(new PointValue(j, 0.1f));//添加节点数据//new Formatdata().longtofloat(pref.getLong(j + 1 + ""
+            } else {
+                values.clear();
+                axisValuesY.clear();
+                axisValuesX.clear();
+                for (int j = 0; j < numberOfPoints; ++j) {
+                    values.add(new PointValue(j, j+0.1f));
                     //axisValuesY.add(new AxisValue(j * 10 * (i + 1)).setLabel(j + ""));//添加Y轴显示的刻度值
                     axisValuesX.add(new AxisValue(j).setLabel(j + 1 + ":00"));//添加X轴显示的刻度值
                 }
             }
-            axisY.setValues(axisValuesY);
-            axisX.setValues(axisValuesX);
-            axisX.setLineColor(Color.BLACK);//无效果
-            axisY.setLineColor(Color.BLACK);//无效果
-            axisX.setTextColor(Color.BLACK);//设置X轴文字颜色
-            axisY.setTextColor(Color.BLACK);//设置Y轴文字颜色
-            axisX.setTextSize(10);//设置X轴文字大小
-            axisX.setTypeface(Typeface.SERIF);//设置文字样式
-            axisX.setHasTiltedLabels(false);//设置X轴文字向左旋转45度
-            axisX.setHasLines(false);//是否显示X轴网格线
-            axisY.setHasLines(false);
-            axisX.setInside(false);//设置X轴文字在X轴内部
-            //axisX.setMaxLabelChars(9); //最多几个X轴坐标，意思就是你的缩放让X轴上数据的个数7<=x<=mAxisXValues.length
-
-            Line line = new Line(pointValues);
+            Line line = new Line(values);
             line.setColor(Color.parseColor("#b6ddfb"));//设置折线颜色
             line.setStrokeWidth(5);//设置折线宽度
             line.setFilled(false);//设置折线覆盖区域颜色
@@ -232,20 +228,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             line.setHasPoints(true);//是否显示节点
             line.setShape(ValueShape.CIRCLE);//节点图形样式 DIAMOND菱形、SQUARE方形、CIRCLE圆形
             line.setHasLabelsOnlyForSelected(false);//隐藏数据，触摸可以显示
-
-            lines.add(line);//将数据集合添加到线
-
-            chartData = new LineChartData(lines);
-            chartData.setAxisYLeft(axisY);//将Y轴属性设置到左边
-            chartData.setAxisXBottom(axisX);//将X轴属性设置到底部
-            chartData.setBaseValue(20);//设置反向覆盖区域颜色
-            chartData.setValueLabelBackgroundAuto(false);//设置数据背景是否跟随节点颜色
-            chartData.setValueLabelBackgroundColor(Color.BLUE);//设置数据背景颜色
-            chartData.setValueLabelBackgroundEnabled(false);//设置是否有数据背景
-            chartData.setValueLabelsTextColor(Color.parseColor("#000000"));//设置数据文字颜色
-            chartData.setValueLabelTextSize(10);//设置数据文字大小
-            chartData.setValueLabelTypeface(Typeface.MONOSPACE);//设置数据文字样式
+            lines.add(line);
         }
+
+        axisY.setValues(axisValuesY);
+        axisX.setValues(axisValuesX);
+        axisX.setLineColor(Color.BLACK);//无效果
+        axisY.setLineColor(Color.BLACK);//无效果
+        axisX.setTextColor(Color.BLACK);//设置X轴文字颜色
+        axisY.setTextColor(Color.BLACK);//设置Y轴文字颜色
+        axisX.setTextSize(10);//设置X轴文字大小
+        axisX.setTypeface(Typeface.SERIF);//设置文字样式
+        axisX.setHasTiltedLabels(false);//设置X轴文字向左旋转45度
+        axisX.setHasLines(false);//是否显示X轴网格线
+        axisY.setHasLines(false);
+        axisX.setInside(false);//设置X轴文字在X轴内部
+
+        chartData = new LineChartData(lines);
+        chartData.setAxisYLeft(axisY);//将Y轴属性设置到左边
+        chartData.setAxisXBottom(axisX);//将X轴属性设置到底部
+        chartData.setBaseValue(20);//设置反向覆盖区域颜色
+        chartData.setValueLabelBackgroundAuto(false);//设置数据背景是否跟随节点颜色
+        chartData.setValueLabelBackgroundColor(Color.BLUE);//设置数据背景颜色
+        chartData.setValueLabelBackgroundEnabled(false);//设置是否有数据背景
+        chartData.setValueLabelsTextColor(Color.parseColor("#000000"));//设置数据文字颜色
+        chartData.setValueLabelTextSize(10);//设置数据文字大小
+        chartData.setValueLabelTypeface(Typeface.MONOSPACE);//设置数据文字样式
+
+
         lineChart.setLineChartData(chartData);//将数据添加到控件中
         lineChart.setInteractive(true);
         //lineChart.setZoomType(ZoomType.HORIZONTAL);
@@ -257,14 +267,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+    private void prepareDataAnimation(int type) {
+        if (type == 0) {
+
+            for (int t=0;t<chartData.getLines().get(0).getValues().size();t++){
+                PointValue value= chartData.getLines().get(0).getValues().get(t);
+                // Here I modify target only for Y values but it is OK to modify X targets as well.
+                value.setTarget(value.getX(),new Formatdata().longtofloat(pref.getLong(t + 1 + "", 0)));//new Formatdata().longtofloat(pref.getLong(value.getX() + 1 + "", 0))
+                Log.d(TAG, "value.x:" + value.getX() + ",value.y:" + value.getY());
+            }
+        } else if (type == 1) {
+            for (PointValue value : chartData.getLines().get(1).getValues()) {
+                // Here I modify target only for Y values but it is OK to modify X targets as well.
+                value.setTarget(value.getX(), 0.1f);//                    value.setTarget(value.getX(), );//
+            }
+        }
+
+        Viewport tempViewport = new Viewport(0, lineChart.getMaximumViewport().height() * 1.4f, 9, 0);//调整y轴,使图标上部有留白:
+        lineChart.setCurrentViewport(tempViewport);//left：0//X轴为0   top:chart.getMaximumViewport()//Y轴的最大值right: 9//X轴显示9列 bottom：0//Y轴为0
+
+    }
+
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.eachmonth:
                 AddLineChartDate(0);//本月
+                //prepareDataAnimation(0);
+                //lineChart.startDataAnimation();
                 break;
             case R.id.eachday:
                 AddLineChartDate(1);//本日
+                //prepareDataAnimation(1);
+                //lineChart.startDataAnimation();
                 break;
             case R.id.fab:
                 ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
