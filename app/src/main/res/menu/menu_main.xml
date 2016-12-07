@@ -6,16 +6,16 @@
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/help"
         android:title="@string/help"
         app:showAsAction="never" />
     <item
         android:id="@+id/log"
-        android:title="显示日志" />
+        android:title="@string/log" />
     <item
         android:id="@+id/about_activity"
-        android:title="关于" />
+        android:title="@string/about" />
 
 </menu>

@@ -28,7 +28,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -157,8 +156,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         AddLineChartDate(0);//本月
-        //AddLineChartDate(1);//本月
-
 
         eachday = (Button) findViewById(R.id.eachday);
         eachday.setOnClickListener(this);
@@ -210,7 +207,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 axisValuesY.clear();
                 axisValuesX.clear();
                 for (int j = 0; j < numberOfPoints; ++j) {
-                    values.add(new PointValue(j, j+0.1f));
+                    values.add(new PointValue(j, j + 0.1f));
                     //axisValuesY.add(new AxisValue(j * 10 * (i + 1)).setLabel(j + ""));//添加Y轴显示的刻度值
                     axisValuesX.add(new AxisValue(j).setLabel(j + 1 + ":00"));//添加X轴显示的刻度值
                 }
@@ -266,14 +263,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-
+    /*
     private void prepareDataAnimation(int type) {
         if (type == 0) {
 
-            for (int t=0;t<chartData.getLines().get(0).getValues().size();t++){
-                PointValue value= chartData.getLines().get(0).getValues().get(t);
+            for (int t = 0; t < chartData.getLines().get(0).getValues().size(); t++) {
+                PointValue value = chartData.getLines().get(0).getValues().get(t);
                 // Here I modify target only for Y values but it is OK to modify X targets as well.
-                value.setTarget(value.getX(),new Formatdata().longtofloat(pref.getLong(t + 1 + "", 0)));//new Formatdata().longtofloat(pref.getLong(value.getX() + 1 + "", 0))
+                value.setTarget(value.getX(), new Formatdata().longtofloat(pref.getLong(t + 1 + "", 0)));//new Formatdata().longtofloat(pref.getLong(value.getX() + 1 + "", 0))
                 Log.d(TAG, "value.x:" + value.getX() + ",value.y:" + value.getY());
             }
         } else if (type == 1) {
@@ -285,9 +282,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Viewport tempViewport = new Viewport(0, lineChart.getMaximumViewport().height() * 1.4f, 9, 0);//调整y轴,使图标上部有留白:
         lineChart.setCurrentViewport(tempViewport);//left：0//X轴为0   top:chart.getMaximumViewport()//Y轴的最大值right: 9//X轴显示9列 bottom：0//Y轴为0
-
     }
-
+*/
 
     @Override
     public void onClick(View v) {
@@ -308,8 +304,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 NetworkInfo wifiInfo = manager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 NetworkInfo activeInfo = manager.getActiveNetworkInfo();
                 if (activeInfo == null) {
-                    Log.d("qiang", "网络没有连接");
-                    Toast.makeText(this, "请关闭wifi并打开数据开关后查询", Toast.LENGTH_SHORT).show();
+                    //Log.d("qiang", "网络没有连接");
+                    Toast.makeText(this, getString(R.string.toast_search), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (activeInfo.isConnected()) {
@@ -321,27 +317,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECEIVE_SMS}, REQUEST_CODE);
                             } else {
                                 progressDialog = new ProgressDialog(MainActivity.this);
-                                progressDialog.setMessage("查询中...");
+                                progressDialog.setMessage(getString(R.string.inquery));
                                 progressDialog.setCancelable(true);
                                 progressDialog.show();
 
                                 sendmessage.Sendmessages();
                                 //静音
                                 sendmessage.silent();
-                                Snackbar.make(v, "已发送", Snackbar.LENGTH_LONG).setAction("", null).show();
-                                Log.d("qiang", "发送成功");
+                                Snackbar.make(v, getString(R.string.sent), Snackbar.LENGTH_LONG).setAction("", null).show();
+                                //Log.d("qiang", "发送成功");
                             }
                         } else {
                             progressDialog = new ProgressDialog(MainActivity.this);
-                            progressDialog.setMessage("查询中...");
+                            progressDialog.setMessage(getString(R.string.inquery));
                             progressDialog.setCancelable(true);
                             progressDialog.show();
 
                             sendmessage.Sendmessages();
                             //静音
                             sendmessage.silent();
-                            Snackbar.make(v, "已发送", Snackbar.LENGTH_LONG).setAction("", null).show();
-                            Log.d("qiang", "发送成功");
+                            Snackbar.make(v, getString(R.string.sent), Snackbar.LENGTH_LONG).setAction("", null).show();
+                            //Log.d("qiang", "发送成功");
                         }
                         IntentFilter intentFilter = new IntentFilter();
                         intentFilter.addAction("android.provider.Telephony.SMS_RECEIVED");
@@ -349,36 +345,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         registerReceiver(dianLiangBR, intentFilter);
                         dianLiangBR.setInteractionListener(MainActivity.this);
                     } else {
-                        Toast.makeText(this, "请关闭wifi并打开数据开关后查询", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.inquery), Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(this, "请关闭wifi并打开数据开关后查询", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.inquery), Toast.LENGTH_SHORT).show();
                 }
+                break;
+            default:
+                break;
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        Log.d(TAG, "requestCode:" + requestCode);
+        //Log.d(TAG, "requestCode:" + requestCode);
         switch (requestCode) {
             case 1:
-                Log.d("qiang", "grantResults:" + grantResults[0]);
+                //Log.d("qiang", "grantResults:" + grantResults[0]);
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Permission Granted
                     progressDialog = new ProgressDialog(MainActivity.this);
-                    progressDialog.setMessage("查询中...");
+                    progressDialog.setMessage(getString(R.string.inquery));
                     progressDialog.setCancelable(true);
                     progressDialog.show();
                     Sendmessage sendmessage = new Sendmessage();
                     sendmessage.Sendmessages();
                     //静音
                     sendmessage.silent();
-                    Log.d("qiang", "发送成功");
+                    //Log.d("qiang", "发送成功");
                 } else {
                     // Permission Denied
-                    Toast.makeText(MainActivity.this, "接受短信权限已关闭", Toast.LENGTH_SHORT)
+                    Toast.makeText(MainActivity.this, getString(R.string.close_sms_grant), Toast.LENGTH_SHORT)
                             .show();
-                    Log.d("qiang", "接受短信权限已关闭");
+                    //Log.d("qiang", "接受短信权限已关闭");
                 }
                 break;
             default:
@@ -407,31 +406,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.log:
                 final AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(this);
                 if (pref_default.getBoolean("log", false)) {
-                    alertDialog2.setTitle("log");
+                    alertDialog2.setTitle(getString(R.string.log));
                     String logstr = new FileManager().readLogFile(this);
                     alertDialog2.setMessage(logstr);
-                    alertDialog2.setPositiveButton("OK", null);
+                    alertDialog2.setPositiveButton(getString(R.string.ok), null);
                     alertDialog2.show();
                 } else {
-                    alertDialog2.setTitle("log");
-                    alertDialog2.setMessage("未开启日志记录功能，是否开启日志记录功能？");
-                    alertDialog2.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    alertDialog2.setTitle(getString(R.string.log));
+                    alertDialog2.setMessage(getString(R.string.log_message));
+                    alertDialog2.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             startActivity(new Intent(MainActivity.this, SettingActivity.class));
                         }
                     });
-                    alertDialog2.setNegativeButton("Cancel", null);
+                    alertDialog2.setNegativeButton(getString(R.string.cancel), null);
                     alertDialog2.show();
                 }
                 break;
             case R.id.help:
                 final AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-                alertDialog.setTitle("帮助");
-                String helpmessage = "1.点击查询按钮是请务必在开启数据且关闭wifi后。" +
-                        "\n2.使用校正功能后请点击查询按钮导入设置。";
+                alertDialog.setTitle(getString(R.string.help));
+                String helpmessage = getString(R.string.help_message);
                 alertDialog.setMessage(helpmessage);
-                alertDialog.setPositiveButton("OK", null);
+                alertDialog.setPositiveButton(getString(R.string.ok), null);
                 alertDialog.show();
                 break;
             case R.id.about_activity:
@@ -446,7 +444,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void setTexts(Context context, String[] content) {
         //delay();
         try {
-            Log.d("qiang", "delay");
+            //Log.d("qiang", "delay");
             Thread.currentThread();
             Thread.sleep(3000);
         } catch (InterruptedException e) {
@@ -464,7 +462,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             long todayflow = calculateTodayFlow.calculate(context);
             new NotificationManagers().showNotificationPrecise(context, todayflow);
         } else {
-            Toast.makeText(this, "查询失败-.-", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.inquery_failure), Toast.LENGTH_LONG).show();
         }
 
         long remain_liuliang = pref.getLong("remain_liuliang", 0);
@@ -561,7 +559,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         void Sendmessages() {
             SmsManager manager = SmsManager.getDefault();
             manager.sendTextMessage(getString(R.string.phone), null, getString(R.string.message_search), null, null);  //发送短信
-            Log.d("qiang", "发送短信中");
+            //Log.d("qiang", "发送短信中");
         }
 
         void silent() {
@@ -576,8 +574,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 audio.setStreamVolume(STREAM_RING, 0, 0);
                 audio.setRingerMode(RINGER_MODE_SILENT);
                 //audio.setRingerMode(RINGER_MODE_SILENT);
-                Log.d("qiang", "old_mode:" + volumn);
-                Log.d("qiang", "old_volumn:" + volumn);
+                //Log.d("qiang", "old_mode:" + volumn);
+                //Log.d("qiang", "old_volumn:" + volumn);
             }
         }
     }

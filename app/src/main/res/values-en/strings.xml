@@ -19,9 +19,11 @@
         <item>Entry 2</item>
         <item>Entry 3</item>
     </string-array>
+
     <string-array name="updatelog">
         <item>1.0\n\t\t\t1.新增闲时统计功能\n\t\t\t2.新增通知管理</item>
         <item>2.0\n\t\t\t1.新增可视化图表\n\t\t\t2.修复已知问题</item>
+        <item>3.0\n\t\t\t1.删除无用权限\n\t\t\t2.重绘图标</item>
     </string-array>
 
     <string-array name="month_day">
@@ -60,4 +62,18 @@
 
     <string name="eachmonth">每月使用情况</string>
     <string name="eachday">每日使用情况</string>
+
+
+    <string name="app_small_name">Inaccurate TrafficStatistic</string>
+    <string name="about">about</string>
+    <string name="log">log</string>
+    <string name="log_message">The logging function is disabled, and the logging function is enabled?</string>
+    <string name="toast_search">Please close the wifi and open the data switch after the query</string>
+    <string name="inquery">querying…</string>
+    <string name="sent">Sent</string>
+    <string name="ok">OK</string>
+    <string name="cancel">cancel</string>
+    <string name="inquery_failure">inquery failure</string>
+    <string name="help_message">--Click the check button is to be sure to open the data and close the wifi\n--After using the calibration function, click the home page search button to import the settings</string>
+    <string name="close_sms_grant">Receive SMS permission is turned off</string>
 </resources>

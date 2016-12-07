@@ -11,45 +11,47 @@
     tools:context="com.example.small.flowstatistics.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <TextView
-        android:id="@+id/main"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:text="Hello World!" />
 
     <LinearLayout
         android:id="@+id/buttonPanel"
-        android:layout_below="@id/main"
-        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:orientation="horizontal">
 
         <Button
             android:id="@+id/eachmonth"
-            android:text="@string/eachmonth"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
             android:elevation="0dp"
-            android:background="@android:color/transparent"  />
+            android:padding="10dp"
+            android:text="@string/eachmonth" />
 
         <Button
+            android:padding="10dp"
             android:id="@+id/eachday"
-            android:text="@string/eachday"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"  />
+            android:background="@android:color/transparent"
+            android:text="@string/eachday" />
     </LinearLayout>
 
     <lecho.lib.hellocharts.view.LineChartView
         android:id="@+id/linechart"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="350dp"
         android:layout_below="@+id/buttonPanel"
-        android:layout_marginBottom="20dp"
         android:padding="10dp" />
+
+    <TextView
+        android:id="@+id/main"
+        android:layout_below="@id/linechart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:text="Hello World!" />
 
 
 </RelativeLayout>

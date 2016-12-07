@@ -58,10 +58,9 @@ public class AlarmReceiverManual extends BroadcastReceiver implements SMSBroadca
 
         int curday = calendar.get(Calendar.DAY_OF_MONTH);
         int curmonth = calendar.get(Calendar.MONTH);
-        if (Objects.equals(Integer.valueOf(pref_default.getString("remonth", "")), curday) && curmonth == pref.getInt("savemonth", 0)) {
+        if (Objects.equals(Integer.valueOf(pref_default.getString("remonth", "")), curday)) {
             editor.putLong("lastmonthflow",pref.getLong("curmonthflow",0));//上个月使用
             editor.putLong("curmonthflow", 0);//
-            editor.putInt("savemonth",curmonth);
         }
         CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();
         long todayflow = calculateTodayFlow.calculate(context);
