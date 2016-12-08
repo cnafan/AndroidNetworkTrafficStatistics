@@ -21,9 +21,10 @@
     </string-array>
 
     <string-array name="updatelog">
-        <item>1.0\n\t\t\t1.新增闲时统计功能\n\t\t\t2.新增通知管理</item>
-        <item>2.0\n\t\t\t1.新增可视化图表\n\t\t\t2.修复已知问题</item>
-        <item>3.0\n\t\t\t1.删除无用权限\n\t\t\t2.重绘图标</item>
+        <item>1.0.0\n\t\t\t1.新增闲时统计功能\n\t\t\t2.新增通知管理</item>
+        <item>2.0.0\n\t\t\t1.新增可视化图表\n\t\t\t2.修复已知问题</item>
+        <item>2.1.0\n\t\t\t1.删除无用权限\n\t\t\t2.重绘图标</item>
+        <item>2.1.1\n\t\t\t1.适配Nougat</item>
     </string-array>
 
     <string-array name="month_day">
@@ -76,4 +77,5 @@
     <string name="inquery_failure">inquery failure</string>
     <string name="help_message">--Click the check button is to be sure to open the data and close the wifi\n--After using the calibration function, click the home page search button to import the settings</string>
     <string name="close_sms_grant">Receive SMS permission is turned off</string>
+    <string name="refresh">refresh</string>
 </resources>

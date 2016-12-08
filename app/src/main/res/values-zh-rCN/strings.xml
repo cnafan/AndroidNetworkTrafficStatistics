@@ -19,9 +19,10 @@
     </string-array>
 
     <string-array name="updatelog">
-        <item>1.0\n\t\t\t1.新增闲时统计功能\n\t\t\t2.新增通知管理</item>
-        <item>2.0\n\t\t\t1.新增可视化图表\n\t\t\t2.修复已知问题</item>
-        <item>3.0\n\t\t\t1.删除无用权限\n\t\t\t2.重绘图标</item>
+        <item>1.0.0\n\t\t\t1.新增闲时统计功能\n\t\t\t2.新增通知管理</item>
+        <item>2.0.0\n\t\t\t1.新增可视化图表\n\t\t\t2.修复已知问题</item>
+        <item>2.1.0\n\t\t\t1.删除无用权限\n\t\t\t2.重绘图标</item>
+        <item>2.1.1\n\t\t\t1.适配Nougat</item>
     </string-array>
 
     <string-array name="month_day">
@@ -73,4 +74,5 @@
     <string name="inquery_failure">查询失败</string>
     <string name="help_message">--点击查询按钮是请务必在开启数据且关闭wifi后\n--使用校正功能后请点击首页查询按钮导入设置"</string>
     <string name="close_sms_grant">接受短信权限已关闭</string>
+    <string name="refresh">刷新</string>
 </resources>

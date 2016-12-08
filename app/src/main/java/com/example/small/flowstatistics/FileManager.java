@@ -29,10 +29,10 @@ class FileManager {
         }
     }
 
-    String readLogFile(Context context) {
+    String readLogFile(Context context,String filename) {
         String res = "";
         try {
-            FileInputStream fin = context.openFileInput("log");
+            FileInputStream fin = context.openFileInput(filename);
             int length = fin.available();
             byte[] buffer = new byte[length];
             fin.read(buffer);

@@ -71,11 +71,16 @@ public class AlarmReceiverTiming extends BroadcastReceiver {
                 }
                 editor.putLong("thisbootflow", thisbootflow);
                 editor.putLong("curdayflow", curdayflow);
-
-                editor.putLong(String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)), pref.getLong("curdayflow",0));
+                editor.putLong(String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)+"day"), pref.getLong("curdayflow",0));
 
                 editor.commit();
 
+                //log_refresh
+                try {
+                    new LogManager().writeLogFilePrivate(context);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 new NotificationManagers().showNotificationPrecise(context, curdayflow);
                 context.startService(new Intent(context, AlarmTimingStart.class));
             }

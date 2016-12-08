@@ -28,6 +28,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -92,14 +93,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String textstr;
         if (pref_default.getBoolean("free", false)) {
             long allfreetimeflow = new Formatdata().GetNumFromString(pref_default.getString("freeflow", "0") + "M");
-            textstr = "本月可用流量（含闲时）：" + new Formatdata().longtostring(all_liuliang) + "\n本月可用闲时流量：" + new Formatdata().longtostring(allfreetimeflow)
-                    + "\n本月已用流量：" + new Formatdata().longtostring(all_liuliang - remain_liuliang)
-                    + "\n本月还剩流量：" + new Formatdata().longtostring(remain_liuliang) + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow)
-                    + "\n今日使用流量(不含闲时)：" + new Formatdata().longtostring(curdayflow - curfreebehind - curfreefront) + "\n今日闲时使用流量：" + new Formatdata().longtostring(curfreetimeflow);
+            textstr = "本月可用流量(含闲时)：" + new Formatdata().longtostring(all_liuliang)
+                    + "\n本月已用流量(含闲时)：" + new Formatdata().longtostring(all_liuliang - remain_liuliang)
+                    + "\n本月还剩流量(含闲时)：" + new Formatdata().longtostring(remain_liuliang)
+                    + "\n本月可用闲时流量：" + new Formatdata().longtostring(allfreetimeflow)
+                    + "\n今日闲时使用流量：" + new Formatdata().longtostring(curfreetimeflow)
+                    + "\n本月还剩流量(不含闲时)：" + new Formatdata().longtostring(remain_liuliang)
+                    + "\n今日使用流量(不含闲时)：" + new Formatdata().longtostring(curdayflow - curfreebehind - curfreefront)
+                    + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow);
         } else {
-            textstr = "本月可用流量：" + new Formatdata().longtostring(all_liuliang) + "\n本月已用流量：" + new Formatdata().longtostring(all_liuliang - remain_liuliang)
-                    + "\n本月还剩流量：" + new Formatdata().longtostring(remain_liuliang) + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow)
-                    + "\n今日使用流量：" + new Formatdata().longtostring(curdayflow);
+            textstr = "本月可用流量：" + new Formatdata().longtostring(all_liuliang)
+                    + "\n本月已用流量：" + new Formatdata().longtostring(all_liuliang - remain_liuliang)
+                    + "\n本月还剩流量：" + new Formatdata().longtostring(remain_liuliang)
+                    + "\n今日使用流量：" + new Formatdata().longtostring(curdayflow)
+                    + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow);
         }
 
         textView = (TextView) findViewById(R.id.main);
@@ -192,13 +199,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             numberOfPoints = LineChartEachDayNums;
         for (int i = 0; i < numberOfLines; ++i) {
             List<PointValue> values = new ArrayList<PointValue>();
-
             if (type == 0) {
                 values.clear();
                 axisValuesY.clear();
                 axisValuesX.clear();
                 for (int j = 0; j < numberOfPoints; ++j) {
-                    values.add(new PointValue(j, new Formatdata().longtofloat(pref.getLong(j + 1 + "", 0))));
+                    values.add(new PointValue(j, new Formatdata().longtofloat(pref.getLong(j + 1 + "day", 0))));
                     //axisValuesY.add(new AxisValue(j * 10 * (i + 1)).setLabel(j + ""));//添加Y轴显示的刻度值
                     axisValuesX.add(new AxisValue(j).setLabel(j + 1 + "日"));//添加X轴显示的刻度值
                 }
@@ -304,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 NetworkInfo wifiInfo = manager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 NetworkInfo activeInfo = manager.getActiveNetworkInfo();
                 if (activeInfo == null) {
-                    //Log.d("qiang", "网络没有连接");
+                    Log.d("qiang", "网络没有连接");
                     Toast.makeText(this, getString(R.string.toast_search), Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -325,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 //静音
                                 sendmessage.silent();
                                 Snackbar.make(v, getString(R.string.sent), Snackbar.LENGTH_LONG).setAction("", null).show();
-                                //Log.d("qiang", "发送成功");
+                                Log.d("qiang", "发送成功");
                             }
                         } else {
                             progressDialog = new ProgressDialog(MainActivity.this);
@@ -337,7 +343,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             //静音
                             sendmessage.silent();
                             Snackbar.make(v, getString(R.string.sent), Snackbar.LENGTH_LONG).setAction("", null).show();
-                            //Log.d("qiang", "发送成功");
+                            Log.d("qiang", "发送成功");
                         }
                         IntentFilter intentFilter = new IntentFilter();
                         intentFilter.addAction("android.provider.Telephony.SMS_RECEIVED");
@@ -358,10 +364,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        //Log.d(TAG, "requestCode:" + requestCode);
+        Log.d(TAG, "requestCode:" + requestCode);
         switch (requestCode) {
             case 1:
-                //Log.d("qiang", "grantResults:" + grantResults[0]);
+                Log.d("qiang", "grantResults:" + grantResults[0]);
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Permission Granted
                     progressDialog = new ProgressDialog(MainActivity.this);
@@ -372,12 +378,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     sendmessage.Sendmessages();
                     //静音
                     sendmessage.silent();
-                    //Log.d("qiang", "发送成功");
+                    Log.d("qiang", "发送成功");
                 } else {
                     // Permission Denied
                     Toast.makeText(MainActivity.this, getString(R.string.close_sms_grant), Toast.LENGTH_SHORT)
                             .show();
-                    //Log.d("qiang", "接受短信权限已关闭");
+                    Log.d("qiang", "接受短信权限已关闭");
                 }
                 break;
             default:
@@ -407,10 +413,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 final AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(this);
                 if (pref_default.getBoolean("log", false)) {
                     alertDialog2.setTitle(getString(R.string.log));
-                    String logstr = new FileManager().readLogFile(this);
+                    String logstr;
+                    if (pref_default.getBoolean("log_refresh_switch", false)) {
+                        logstr = new FileManager().readLogFile(this, "log");
+                    } else {
+                        logstr = new FileManager().readLogFile(this, "log_refresh");
+                    }
                     alertDialog2.setMessage(logstr);
                     alertDialog2.setPositiveButton(getString(R.string.ok), null);
+                    alertDialog2.setNegativeButton(getString(R.string.refresh), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (pref.getBoolean("log_refresh_switch", false))
+                                editor.putBoolean("log_refresh_switch", true);
+                            else
+                                editor.putBoolean("log_refresh_switch", false);
+                            editor.commit();
+                            alertDialog2.show().dismiss();
+                            alertDialog2.show();
+                        }
+                    });
                     alertDialog2.show();
+
                 } else {
                     alertDialog2.setTitle(getString(R.string.log));
                     alertDialog2.setMessage(getString(R.string.log_message));
@@ -444,7 +468,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void setTexts(Context context, String[] content) {
         //delay();
         try {
-            //Log.d("qiang", "delay");
+            Log.d("qiang", "delay");
             Thread.currentThread();
             Thread.sleep(3000);
         } catch (InterruptedException e) {
@@ -545,7 +569,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void recovery() {
-        //Log.d("qiang", "volumn:" + volumn);
+        Log.d("qiang", "volumn:" + volumn);
         if (Build.VERSION.SDK_INT >= 24) {
             audio = (AudioManager) getSystemService(AUDIO_SERVICE);
         } else {
@@ -559,7 +583,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         void Sendmessages() {
             SmsManager manager = SmsManager.getDefault();
             manager.sendTextMessage(getString(R.string.phone), null, getString(R.string.message_search), null, null);  //发送短信
-            //Log.d("qiang", "发送短信中");
+            Log.d("qiang", "发送短信中");
         }
 
         void silent() {
