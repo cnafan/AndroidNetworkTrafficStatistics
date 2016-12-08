@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             long allfreetimeflow = new Formatdata().GetNumFromString(pref_default.getString("freeflow", "0") + "M");
             textstr = "本月可用流量(含闲时)：" + new Formatdata().longtostring(all_liuliang)
                     + "\n本月已用流量(含闲时)：" + new Formatdata().longtostring(all_liuliang - remain_liuliang)
-                    + "\n本月还剩流量(含闲时)：" + new Formatdata().longtostring(remain_liuliang)
+                    + "\n本月还剩流量(含闲时)：" + new Formatdata().longtostring(remain_liuliang - curdayflow - allfreetimeflow)
                     + "\n本月可用闲时流量：" + new Formatdata().longtostring(allfreetimeflow)
                     + "\n今日闲时使用流量：" + new Formatdata().longtostring(curfreetimeflow)
                     + "\n本月还剩流量(不含闲时)：" + new Formatdata().longtostring(remain_liuliang)
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             textstr = "本月可用流量：" + new Formatdata().longtostring(all_liuliang)
                     + "\n本月已用流量：" + new Formatdata().longtostring(all_liuliang - remain_liuliang)
-                    + "\n本月还剩流量：" + new Formatdata().longtostring(remain_liuliang)
+                    + "\n本月还剩流量：" + new Formatdata().longtostring(remain_liuliang - curdayflow)
                     + "\n今日使用流量：" + new Formatdata().longtostring(curdayflow)
                     + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow);
         }
@@ -140,11 +140,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             editor.putLong("allfreetimeflow", 0);//闲时流量总量
             editor.putLong("curmonthfreeflow", 0);//当月使用闲时流量
             editor.commit();
-        }
-        if (!isMyServiceRunning()) {
             startService(new Intent(this, AlarmTimingStart.class));
             startService(new Intent(this, AlarmFreeStart.class));
             startService(new Intent(this, AlarmManualStart.class));
+
+            startActivity(new Intent(MainActivity.this,SettingActivity.class));
         }
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
