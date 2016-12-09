@@ -1,10 +1,14 @@
 package com.example.small.flowstatistics;
 
+import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,10 +20,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import static android.support.design.widget.Snackbar.LENGTH_SHORT;
@@ -59,10 +61,20 @@ public class AboutActivity extends AppCompatActivity {
         icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Calendar calendar = Calendar.getInstance();
-                int systemTime = calendar.get(Calendar.HOUR_OF_DAY);
-                Toast.makeText(AboutActivity.this, systemTime + "", Toast.LENGTH_SHORT).show();
-                Snackbar.make(getWindow().getDecorView(), myDevice(), LENGTH_SHORT).show();
+                ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo mobileInfo = manager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+                NetworkInfo wifiInfo = manager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                NetworkInfo activeInfo = manager.getActiveNetworkInfo();
+                Snackbar.make(getWindow().getDecorView(), myDevice() +":"+activeInfo.getTypeName()+ "", LENGTH_SHORT).show();
+
+                //log
+                AlertDialog.Builder alertDialogLog = new AlertDialog.Builder(AboutActivity.this);
+                String logstr = new FileManager().readLogFile(AboutActivity.this, "log");
+                alertDialogLog.setMessage(logstr);
+                alertDialogLog.setMessage(logstr);
+                alertDialogLog.setPositiveButton(getString(R.string.ok), null);
+                alertDialogLog.show();
+
                 //getWindow().getDecorView()
             }
         });

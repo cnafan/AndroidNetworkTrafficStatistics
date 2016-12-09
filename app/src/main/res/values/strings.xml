@@ -17,6 +17,7 @@
         <item>2.0.0\n\t\t\t1.新增可视化图表\n\t\t\t2.修复已知问题</item>
         <item>2.1.0\n\t\t\t1.删除无用权限\n\t\t\t2.重绘图标</item>
         <item>2.1.1\n\t\t\t1.适配Nougat</item>
+        <item>3.1.3\n\t\t\t1.扩大正则表达式适用范围</item>
     </string-array>
 
     <string-array name="list_preference_entries">

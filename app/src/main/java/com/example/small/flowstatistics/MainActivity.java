@@ -68,15 +68,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ProgressDialog progressDialog;
     public FloatingActionButton fab;
     private static final int REQUEST_CODE = 1;
-    private static final int RECEIVE_SMS_REQUEST_CODE = 2;
-    public static int FLAG = 1;
+    //private static final int RECEIVE_SMS_REQUEST_CODE = 2;
+    // public static int FLAG = 1;
 
     public SharedPreferences pref_default;
     public SharedPreferences.Editor editor;
     public SharedPreferences pref;
 
     static String TAG = "qiang";
-    private final static String[] mLabels = {"ANT", "GNU", "OWL", "APE", "COD", "YAK", "RAM", "JAY"};
+    //private final static String[] mLabels = {"ANT", "GNU", "OWL", "APE", "COD", "YAK", "RAM", "JAY"};
 
     @Override
     protected void onResume() {
@@ -102,9 +102,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     + "\n今日使用流量(不含闲时)：" + new Formatdata().longtostring(curdayflow - curfreebehind - curfreefront)
                     + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow);
         } else {
+
             textstr = "本月可用流量：" + new Formatdata().longtostring(all_liuliang)
                     + "\n本月已用流量：" + new Formatdata().longtostring(all_liuliang - remain_liuliang)
-                    + "\n本月还剩流量：" + new Formatdata().longtostring(remain_liuliang - curdayflow)
+                    + "\n本月还剩流量：" + ((pref.getBoolean("sent",false))?new Formatdata().longtostring(remain_liuliang - curdayflow):"0K")
                     + "\n今日使用流量：" + new Formatdata().longtostring(curdayflow)
                     + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow);
         }
@@ -144,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startService(new Intent(this, AlarmFreeStart.class));
             startService(new Intent(this, AlarmManualStart.class));
 
-            startActivity(new Intent(MainActivity.this,SettingActivity.class));
+            startActivity(new Intent(MainActivity.this, SettingActivity.class));
         }
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
@@ -204,10 +205,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 axisValuesY.clear();
                 axisValuesX.clear();
                 for (int j = 0; j < numberOfPoints; ++j) {
-                    values.add(new PointValue(j, new Formatdata().longtofloat(pref.getLong(j + 1 + "day", 0))));
+                    float yvalue = new Formatdata().longtofloat(pref.getLong(j + 1 + "day", 0));
+
+                    if (j==30)
+                        yvalue=0.01f;
+
+                    values.add(new PointValue(j, yvalue));
+                    Log.d(TAG, "pointvalue:" + (j + 1) + "," + yvalue);
                     //axisValuesY.add(new AxisValue(j * 10 * (i + 1)).setLabel(j + ""));//添加Y轴显示的刻度值
                     axisValuesX.add(new AxisValue(j).setLabel(j + 1 + "日"));//添加X轴显示的刻度值
                 }
+
+                //Calendar calendar = Calendar.getInstance();
+                //int curday = calendar.get(Calendar.DAY_OF_MONTH);
+                //values.set(curday,new PointValue(22,new Formatdata().longtofloat(pref.getLong("curdayflow",0))));
             } else {
                 values.clear();
                 axisValuesY.clear();
@@ -257,7 +268,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         chartData.setValueLabelsTextColor(Color.parseColor("#000000"));//设置数据文字颜色
         chartData.setValueLabelTextSize(10);//设置数据文字大小
         chartData.setValueLabelTypeface(Typeface.MONOSPACE);//设置数据文字样式
-
 
         lineChart.setLineChartData(chartData);//将数据添加到控件中
         lineChart.setInteractive(true);
@@ -413,28 +423,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 final AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(this);
                 if (pref_default.getBoolean("log", false)) {
                     alertDialog2.setTitle(getString(R.string.log));
-                    String logstr;
-                    if (pref_default.getBoolean("log_refresh_switch", false)) {
-                        logstr = new FileManager().readLogFile(this, "log");
-                    } else {
-                        logstr = new FileManager().readLogFile(this, "log_refresh");
-                    }
+                    String logstr = new FileManager().readLogFile(this, "log_refresh");
                     alertDialog2.setMessage(logstr);
                     alertDialog2.setPositiveButton(getString(R.string.ok), null);
-                    alertDialog2.setNegativeButton(getString(R.string.refresh), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if (pref.getBoolean("log_refresh_switch", false))
-                                editor.putBoolean("log_refresh_switch", true);
-                            else
-                                editor.putBoolean("log_refresh_switch", false);
-                            editor.commit();
-                            alertDialog2.show().dismiss();
-                            alertDialog2.show();
-                        }
-                    });
                     alertDialog2.show();
-
                 } else {
                     alertDialog2.setTitle(getString(R.string.log));
                     alertDialog2.setMessage(getString(R.string.log_message));
@@ -480,6 +472,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             editor.putLong("curmonthflow", 0);
             editor.putLong("remain_liuliang", new Formatdata().GetNumFromString(content[0]));
             editor.putLong("all_liuliang", new Formatdata().GetNumFromString(content[1]));
+            editor.putBoolean("sent",true);
             editor.commit();
 
             CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();

@@ -6,6 +6,8 @@ import java.text.DecimalFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.example.small.flowstatistics.MainActivity.TAG;
+
 /**
  * Created by small on 2016/11/2.
  */
@@ -37,13 +39,16 @@ import java.util.regex.Pattern;
     }
 
     long GetNumFromString(String data) {
-        String reg = "\\d+.\\d+";
+        String reg = "\\d+\\.?\\d*";
         String result_match = "";
         Pattern reg_data = Pattern.compile(reg);
         Matcher matcher = reg_data.matcher(data);
         if (matcher.find()) {
             result_match = matcher.group(0);
         }
+        Log.d(TAG,"match:"+result_match);
+        Log.d(TAG,"match_data:"+data);
+
         long result;
         double num=Double.parseDouble(result_match);
         String last=GetLastFromString(data);

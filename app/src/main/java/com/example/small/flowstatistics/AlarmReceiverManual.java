@@ -15,6 +15,7 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Objects;
 
@@ -38,6 +39,7 @@ public class AlarmReceiverManual extends BroadcastReceiver implements SMSBroadca
     @Override
     public void onReceive(Context context, Intent intent) {
 
+        String logstr="AlarmReceiverManual";
         SharedPreferences pref_default = getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = context.getSharedPreferences("data", Context.MODE_PRIVATE).edit();
         SharedPreferences pref = context.getSharedPreferences("data", MODE_PRIVATE);
@@ -61,7 +63,9 @@ public class AlarmReceiverManual extends BroadcastReceiver implements SMSBroadca
         //重置
         if (Objects.equals(Integer.valueOf(pref_default.getString("remonth", "")), curday)) {
             editor.putLong("lastmonthflow",pref.getLong("curmonthflow",0));//上个月使用
+            logstr+="\n"+"lastmonthflow"+":"+pref.getLong("curmonthflow",0);
             editor.putLong("curmonthflow", 0);//
+            logstr+="\n"+"lastmonthflow"+":"+pref.getLong("curmonthflow",0);
         }
 
         CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();
@@ -69,7 +73,9 @@ public class AlarmReceiverManual extends BroadcastReceiver implements SMSBroadca
         long curmonthflow = pref.getLong("curmonthflow", 0);
         curmonthflow = curmonthflow + todayflow;
         editor.putLong("curmonthflow", curmonthflow);
+        logstr+="\n"+"curmonthflow"+":"+curmonthflow;
         editor.putLong("curfreebehind",0);
+        logstr+="\n"+"curfreebehind"+":"+0;
         //启动longRunningService
         Intent i = new Intent(context, AlarmManualStart.class);
         context.startService(i);
@@ -94,9 +100,13 @@ public class AlarmReceiverManual extends BroadcastReceiver implements SMSBroadca
         }
         onebootlastdayflow = thisbootflow + onedaylastbootflow;
         editor.putLong("onebootlastdayflow", onebootlastdayflow);
-        //editor.putLong("onedaylastbootflow", 0);
-
-
+        logstr+="\n"+"onebootlastdayflow"+":"+onebootlastdayflow;
+//log
+        try {
+            new LogManager().writeLogFileAppend(context, logstr);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         editor.commit();
         Log.d(TAG, "每日更新广播处理完毕manual");
     }
@@ -118,7 +128,9 @@ public class AlarmReceiverManual extends BroadcastReceiver implements SMSBroadca
             editor.putLong("all_liuliang", new Formatdata().GetNumFromString(content[1]));
             editor.putLong("curfreebehind",0);
             editor.putLong("curfreefront",0);
+            editor.putBoolean("sent",true);
             editor.commit();
+
 
             CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();
             long todayflow = calculateTodayFlow.calculate(context);

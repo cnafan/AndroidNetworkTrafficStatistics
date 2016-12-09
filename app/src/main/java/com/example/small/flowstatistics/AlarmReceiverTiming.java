@@ -27,7 +27,7 @@ public class AlarmReceiverTiming extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(TAG, "快速更新广播收到");
-
+        String logstr = "AlarmReceiverTiming";
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mobileInfo = manager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
         NetworkInfo wifiInfo = manager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
@@ -38,12 +38,7 @@ public class AlarmReceiverTiming extends BroadcastReceiver {
         }
         if (activeInfo.isConnected()) {
             if (Objects.equals(activeInfo.getTypeName(), "MOBILE")) {
-                //log
-                try {
-                    new LogManager().writeLogFileAppend(context);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
                 SharedPreferences.Editor editor = context.getSharedPreferences("data", MODE_PRIVATE).edit();
                 SharedPreferences pref = context.getSharedPreferences("data", MODE_PRIVATE);
 
@@ -58,23 +53,32 @@ public class AlarmReceiverTiming extends BroadcastReceiver {
                 long curdayflow = calculateTodayFlow.calculate(context);
                 long freetimeflowstart = pref.getLong("freetimeflowstart", 0);
 
-                Calendar calendar= Calendar.getInstance();
+                Calendar calendar = Calendar.getInstance();
                 int systemTime = calendar.get(Calendar.HOUR_OF_DAY);
                 //Toast.makeText(context,systemTime,Toast.LENGTH_SHORT);
                 if (systemTime > 22) {//从23点开始截止到次日7点
-                    Log.d(TAG,"23free");
+                    Log.d(TAG, "23free");
                     editor.putLong("curfreebehind", curdayflow - freetimeflowstart);
-
+                    logstr += "\ncurfreebehind:" + (curdayflow - freetimeflowstart);
                 } else if (systemTime < 6) {
-                    Log.d(TAG,"07free");
+                    Log.d(TAG, "07free");
                     editor.putLong("curfreefront", curdayflow);
+                    logstr += "\ncurfreefront:" + (curdayflow);
                 }
                 editor.putLong("thisbootflow", thisbootflow);
+                logstr += "\nthisbootflow:" + (thisbootflow);
                 editor.putLong("curdayflow", curdayflow);
-                editor.putLong(String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)+"day"), pref.getLong("curdayflow",0));
-
+                logstr += "\ncurdayflow:" + (curdayflow);
+                editor.putLong(String.valueOf(calendar.get(Calendar.DAY_OF_MONTH) + "day"), pref.getLong("curdayflow", 0));
+                logstr += "\n"+String.valueOf(calendar.get(Calendar.DAY_OF_MONTH) + "day") +":"+ (pref.getLong("curdayflow", 0));
                 editor.commit();
 
+                //log
+                try {
+                    new LogManager().writeLogFileAppend(context, logstr);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 //log_refresh
                 try {
                     new LogManager().writeLogFilePrivate(context);

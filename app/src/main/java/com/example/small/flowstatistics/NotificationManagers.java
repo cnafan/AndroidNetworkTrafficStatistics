@@ -42,8 +42,8 @@ class NotificationManagers {
         long all_liuliang = pref.getLong("all_liuliang", 0);
         long curmonthflow = pref.getLong("curmonthflow", 0);
         long curfreetimeflow = pref.getLong("curfreetimeflow", 0);
-        long allfreetimeflow =  new Formatdata().GetNumFromString(pref_default.getString("freeflow", "0")+ "M");
-        long curmonthfreeflow=pref.getLong("curmonthfreeflow",0);
+        long allfreetimeflow = new Formatdata().GetNumFromString(pref_default.getString("freeflow", "0") + "M");
+        long curmonthfreeflow = pref.getLong("curmonthfreeflow", 0);
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         String notification_string;
@@ -53,14 +53,14 @@ class NotificationManagers {
             if (pref_default.getBoolean("free", true)) {
                 Calendar calendar = Calendar.getInstance();
                 int systemTime = calendar.get(Calendar.HOUR_OF_DAY);
-                if (systemTime > 22 ||systemTime < 7)  {//从23点开始截止到次日7点
-                    notification_string = "本月闲时还剩 " + new Formatdata().longtostring(allfreetimeflow-curmonthfreeflow-curfreetimeflow) + " 今日已用闲时" + new Formatdata().longtostring(curfreetimeflow);
+                if (systemTime > 22 || systemTime < 7) {//从23点开始截止到次日7点
+                    notification_string = "本月闲时还剩 " + ((pref.getBoolean("sent", false)) ? new Formatdata().longtostring(allfreetimeflow - curmonthfreeflow - curfreetimeflow) : "0k") + " 今日已用闲时" + new Formatdata().longtostring(curfreetimeflow);
 
                 } else {
-                    notification_string = "本月流量还剩 " + new Formatdata().longtostring(remain_liuliang - curmonthflow - curdayflow - allfreetimeflow) + " 今日已用" + new Formatdata().longtostring(curdayflow);
+                    notification_string = "本月流量还剩 " + ((pref.getBoolean("sent", false)) ? new Formatdata().longtostring(remain_liuliang - curmonthflow - curdayflow - allfreetimeflow) : "0k") + " 今日已用" + new Formatdata().longtostring(curdayflow);
                 }
             } else {
-                notification_string = "本月流量还剩 " + new Formatdata().longtostring(remain_liuliang - curmonthflow - curdayflow) + " 今日已用" + new Formatdata().longtostring(curdayflow);
+                notification_string = "本月流量还剩 " + ((pref.getBoolean("sent", false)) ? new Formatdata().longtostring(remain_liuliang - curmonthflow - curdayflow) : "0k") + " 今日已用" + new Formatdata().longtostring(curdayflow);
 
             }
         }

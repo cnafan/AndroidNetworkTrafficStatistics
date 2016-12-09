@@ -23,15 +23,15 @@ class LogManager {
 
 
     //写数据
-    void writeLogFileAppend(Context context) throws IOException {
+    void writeLogFileAppend(Context context,String str) throws IOException {
         SharedPreferences pref_default = getDefaultSharedPreferences(context);
         if (pref_default.getBoolean("log", false)) {
             Time time = new Time();
             time.setToNow();
-            String logstr = time.monthDay + ":" + time.hour + ":" + time.minute + ":" + time.second;
+            String logstr =  "\n---" +time.monthDay + "-" + time.hour + ":" + time.minute + ":" + time.second+"\n";
             try {
                 FileOutputStream fout = context.openFileOutput("log", MODE_APPEND);
-                byte[] bytes = logstr.getBytes();
+                byte[] bytes = (logstr+str).getBytes();
                 fout.write(bytes);
                 fout.close();
             } catch (Exception e) {
