@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             long allfreetimeflow = new Formatdata().GetNumFromString(pref_default.getString("freeflow", "0") + "M");
             textstr = "本月可用流量(含闲时)：" + new Formatdata().longtostring(all_liuliang)
                     + "\n本月已用流量(含闲时)：" + new Formatdata().longtostring(all_liuliang - remain_liuliang)
-                    + "\n本月还剩流量(含闲时)：" + new Formatdata().longtostring(remain_liuliang - curdayflow - allfreetimeflow)
+                    + "\n本月还剩流量(含闲时)：" +((pref.getBoolean("sent",false))? new Formatdata().longtostring(remain_liuliang - curdayflow - allfreetimeflow):"0K")
                     + "\n本月可用闲时流量：" + new Formatdata().longtostring(allfreetimeflow)
                     + "\n今日闲时使用流量：" + new Formatdata().longtostring(curfreetimeflow)
                     + "\n本月还剩流量(不含闲时)：" + new Formatdata().longtostring(remain_liuliang)
@@ -361,10 +361,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         registerReceiver(dianLiangBR, intentFilter);
                         dianLiangBR.setInteractionListener(MainActivity.this);
                     } else {
-                        Toast.makeText(this, getString(R.string.inquery), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.toast_search), Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(this, getString(R.string.inquery), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.toast_search), Toast.LENGTH_SHORT).show();
                 }
                 break;
             default:
