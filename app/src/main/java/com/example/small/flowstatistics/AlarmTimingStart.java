@@ -33,7 +33,7 @@ public class AlarmTimingStart extends Service {
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         Intent intent1 = new Intent(this, AlarmReceiverTiming.class); //触发广播，广播回调此方法，实现循环
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent1, PendingIntent.FLAG_UPDATE_CURRENT);
-        long triggerTime = SystemClock.elapsedRealtime() + 1 * 30 * 1000; //每隔--秒触发一次
+        long triggerTime = SystemClock.elapsedRealtime() + 3 * 60 * 1000; //每隔--秒触发一次
         alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTime, pendingIntent);
         Log.d("qiang", "快速广播已发");
 

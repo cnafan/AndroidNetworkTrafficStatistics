@@ -1,6 +1,7 @@
 package com.example.small.flowstatistics;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
@@ -36,6 +37,10 @@ public class AboutActivity extends AppCompatActivity {
 
     private List<String> mdata;
 
+    public SharedPreferences pref_default;
+    public SharedPreferences.Editor editor;
+    public SharedPreferences pref;
+
     protected void initData() {
         mdata = new ArrayList<String>();
         for (int i = 'A'; i < 'z'; i++) {
@@ -48,6 +53,9 @@ public class AboutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
         initData();
+
+        editor = getSharedPreferences("data", Context.MODE_PRIVATE).edit();
+        pref = getSharedPreferences("data", MODE_PRIVATE);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -65,16 +73,17 @@ public class AboutActivity extends AppCompatActivity {
                 NetworkInfo mobileInfo = manager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
                 NetworkInfo wifiInfo = manager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 NetworkInfo activeInfo = manager.getActiveNetworkInfo();
-                Snackbar.make(getWindow().getDecorView(), myDevice() +":"+activeInfo.getTypeName()+ "", LENGTH_SHORT).show();
+                Snackbar.make(getWindow().getDecorView(), myDevice() + ":" + activeInfo.getTypeName() + "", LENGTH_SHORT).show();
 
-                //log
-                AlertDialog.Builder alertDialogLog = new AlertDialog.Builder(AboutActivity.this);
-                String logstr = new FileManager().readLogFile(AboutActivity.this, "log");
-                alertDialogLog.setMessage(logstr);
-                alertDialogLog.setMessage(logstr);
-                alertDialogLog.setPositiveButton(getString(R.string.ok), null);
-                alertDialogLog.show();
-
+                if (pref.getBoolean("log",false)) {
+                    //log
+                    AlertDialog.Builder alertDialogLog = new AlertDialog.Builder(AboutActivity.this);
+                    String logstr = new FileManager().readLogFile(AboutActivity.this, "log");
+                    alertDialogLog.setMessage(logstr);
+                    alertDialogLog.setMessage(logstr);
+                    alertDialogLog.setPositiveButton(getString(R.string.ok), null);
+                    alertDialogLog.show();
+                }
                 //getWindow().getDecorView()
             }
         });

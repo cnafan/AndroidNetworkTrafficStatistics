@@ -81,9 +81,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-
-        long remain_liuliang = pref.getLong("remain_liuliang", 0);
+        long curmonthflow = pref.getLong("curmonthflow", 0);
         long all_liuliang = pref.getLong("all_liuliang", 0);
+        long remain_liuliang = pref.getLong("remain_liuliang", 0);
         long curdayflow = pref.getLong("curdayflow", 0);
         long lastmonthflow = pref.getLong("lastmonthflow", 0);
         long curfreetimeflow = pref.getLong("curfreetimeflow", 0);
@@ -91,21 +91,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         long curfreebehind = pref.getLong("curfreebehind", 0);
 
         String textstr;
+        //本月可用流量(含闲时)=总流量 本月还剩流量(含闲时)=总流量去掉不可用后剩余的 本月还剩流量(不含闲时)=本月还剩流量(含闲时)-闲时流量
+
         if (pref_default.getBoolean("free", false)) {
             long allfreetimeflow = new Formatdata().GetNumFromString(pref_default.getString("freeflow", "0") + "M");
-            textstr = "本月可用流量(含闲时)：" + new Formatdata().longtostring(all_liuliang)
-                    + "\n本月已用流量(含闲时)：" + new Formatdata().longtostring(all_liuliang - remain_liuliang)
-                    + "\n本月还剩流量(含闲时)：" +((pref.getBoolean("sent",false))? new Formatdata().longtostring(remain_liuliang - curdayflow - allfreetimeflow):"0K")
+            textstr = "本月可用流量(含闲时)：" + new Formatdata().longtostring(remain_liuliang)
+                    + "\n本月已用流量(含闲时)：" + new Formatdata().longtostring(curmonthflow)
+                    + "\n本月还剩流量(含闲时)：" + ((pref.getBoolean("sent", false)) ? new Formatdata().longtostring(remain_liuliang - curmonthflow - curdayflow) : "0K")
                     + "\n本月可用闲时流量：" + new Formatdata().longtostring(allfreetimeflow)
                     + "\n今日闲时使用流量：" + new Formatdata().longtostring(curfreetimeflow)
-                    + "\n本月还剩流量(不含闲时)：" + new Formatdata().longtostring(remain_liuliang)
+                    + "\n本月还剩流量(不含闲时)：" + new Formatdata().longtostring(remain_liuliang - curmonthflow- curdayflow - allfreetimeflow)
                     + "\n今日使用流量(不含闲时)：" + new Formatdata().longtostring(curdayflow - curfreebehind - curfreefront)
                     + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow);
         } else {
-
             textstr = "本月可用流量：" + new Formatdata().longtostring(all_liuliang)
-                    + "\n本月已用流量：" + new Formatdata().longtostring(all_liuliang - remain_liuliang)
-                    + "\n本月还剩流量：" + ((pref.getBoolean("sent",false))?new Formatdata().longtostring(remain_liuliang - curdayflow):"0K")
+                    + "\n本月已用流量：" + new Formatdata().longtostring(curmonthflow)
+                    + "\n本月还剩流量：" + ((pref.getBoolean("sent", false)) ? new Formatdata().longtostring(remain_liuliang - curmonthflow - curdayflow) : "0K")
                     + "\n今日使用流量：" + new Formatdata().longtostring(curdayflow)
                     + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow);
         }
@@ -137,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             editor.putBoolean("isfirstrun", false);
             editor.putLong("curmonthflow", 0);//7
             editor.putLong("lastmonthflow", 0);
-            editor.putLong("curfreetimeflow", 0);//当日闲时流量
+            //editor.putLong("curfreetimeflow", 0);//当日闲时流量=curfreebehind+curfreefront
             editor.putLong("allfreetimeflow", 0);//闲时流量总量
             editor.putLong("curmonthfreeflow", 0);//当月使用闲时流量
             editor.commit();
@@ -169,7 +170,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         eachday.setOnClickListener(this);
         eachmonth = (Button) findViewById(R.id.eachmonth);
         eachmonth.setOnClickListener(this);
-
     }
 
     /**
@@ -190,7 +190,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ArrayList<AxisValue> axisValuesY = new ArrayList<AxisValue>();
         ArrayList<AxisValue> axisValuesX = new ArrayList<AxisValue>();
         List<Line> lines = new ArrayList<Line>();
-
         Axis axisY = new Axis();//Y轴属性
         Axis axisX = new Axis();//X轴属性
 
@@ -206,16 +205,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 axisValuesX.clear();
                 for (int j = 0; j < numberOfPoints; ++j) {
                     float yvalue = new Formatdata().longtofloat(pref.getLong(j + 1 + "day", 0));
-
-                    if (j==30)
-                        yvalue=0.01f;
-
+                    if (j == 30)
+                        yvalue = 0.01f;
                     values.add(new PointValue(j, yvalue));
                     Log.d(TAG, "pointvalue:" + (j + 1) + "," + yvalue);
                     //axisValuesY.add(new AxisValue(j * 10 * (i + 1)).setLabel(j + ""));//添加Y轴显示的刻度值
                     axisValuesX.add(new AxisValue(j).setLabel(j + 1 + "日"));//添加X轴显示的刻度值
                 }
-
                 //Calendar calendar = Calendar.getInstance();
                 //int curday = calendar.get(Calendar.DAY_OF_MONTH);
                 //values.set(curday,new PointValue(22,new Formatdata().longtofloat(pref.getLong("curdayflow",0))));
@@ -276,13 +272,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         lineChart.setVisibility(View.VISIBLE);
         Viewport tempViewport = new Viewport(0, lineChart.getMaximumViewport().height() * 1.4f, 9, 0);//调整y轴,使图标上部有留白:
         lineChart.setCurrentViewport(tempViewport);//left：0//X轴为0   top:chart.getMaximumViewport()//Y轴的最大值right: 9//X轴显示9列 bottom：0//Y轴为0
-
     }
 
     /*
     private void prepareDataAnimation(int type) {
         if (type == 0) {
-
             for (int t = 0; t < chartData.getLines().get(0).getValues().size(); t++) {
                 PointValue value = chartData.getLines().get(0).getValues().get(t);
                 // Here I modify target only for Y values but it is OK to modify X targets as well.
@@ -295,7 +289,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 value.setTarget(value.getX(), 0.1f);//                    value.setTarget(value.getX(), );//
             }
         }
-
         Viewport tempViewport = new Viewport(0, lineChart.getMaximumViewport().height() * 1.4f, 9, 0);//调整y轴,使图标上部有留白:
         lineChart.setCurrentViewport(tempViewport);//left：0//X轴为0   top:chart.getMaximumViewport()//Y轴的最大值right: 9//X轴显示9列 bottom：0//Y轴为0
     }
@@ -336,7 +329,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 progressDialog.setMessage(getString(R.string.inquery));
                                 progressDialog.setCancelable(true);
                                 progressDialog.show();
-
                                 sendmessage.Sendmessages();
                                 //静音
                                 sendmessage.silent();
@@ -348,7 +340,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             progressDialog.setMessage(getString(R.string.inquery));
                             progressDialog.setCancelable(true);
                             progressDialog.show();
-
                             sendmessage.Sendmessages();
                             //静音
                             sendmessage.silent();
@@ -472,7 +463,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             editor.putLong("curmonthflow", 0);
             editor.putLong("remain_liuliang", new Formatdata().GetNumFromString(content[0]));
             editor.putLong("all_liuliang", new Formatdata().GetNumFromString(content[1]));
-            editor.putBoolean("sent",true);
+            editor.putBoolean("sent", true);
             editor.commit();
 
             CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();

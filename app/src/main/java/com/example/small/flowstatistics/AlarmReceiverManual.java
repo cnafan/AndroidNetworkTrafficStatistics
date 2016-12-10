@@ -71,7 +71,7 @@ public class AlarmReceiverManual extends BroadcastReceiver implements SMSBroadca
         CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();
         long todayflow = calculateTodayFlow.calculate(context);
         long curmonthflow = pref.getLong("curmonthflow", 0);
-        curmonthflow = curmonthflow + todayflow;
+        curmonthflow = curmonthflow + todayflow;//包含闲时的
         editor.putLong("curmonthflow", curmonthflow);
         logstr+="\n"+"curmonthflow"+":"+curmonthflow;
         editor.putLong("curfreebehind",0);
@@ -110,6 +110,7 @@ public class AlarmReceiverManual extends BroadcastReceiver implements SMSBroadca
         editor.commit();
         Log.d(TAG, "每日更新广播处理完毕manual");
     }
+
     @Override
     public void setTexts(Context context, String[] content) {
         //delay();

@@ -15,6 +15,7 @@ import java.util.Calendar;
 import java.util.Objects;
 
 import static android.content.Context.MODE_PRIVATE;
+import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 import static com.example.small.flowstatistics.MainActivity.TAG;
 
 /**
@@ -32,15 +33,18 @@ public class AlarmReceiverTiming extends BroadcastReceiver {
         NetworkInfo mobileInfo = manager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
         NetworkInfo wifiInfo = manager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         NetworkInfo activeInfo = manager.getActiveNetworkInfo();
+        String notification_string;
+
+        SharedPreferences.Editor editor = context.getSharedPreferences("data", MODE_PRIVATE).edit();
+        SharedPreferences pref = context.getSharedPreferences("data", MODE_PRIVATE);
+        SharedPreferences pref_default = getDefaultSharedPreferences(context);
+
         if (activeInfo == null) {
             Log.d(TAG, "网络没有连接");
             return;
         }
         if (activeInfo.isConnected()) {
             if (Objects.equals(activeInfo.getTypeName(), "MOBILE")) {
-
-                SharedPreferences.Editor editor = context.getSharedPreferences("data", MODE_PRIVATE).edit();
-                SharedPreferences pref = context.getSharedPreferences("data", MODE_PRIVATE);
 
                 long cur_boot_mobiletx = TrafficStats.getMobileTxBytes();
                 long cur_boot_mobilerx = TrafficStats.getMobileRxBytes();
@@ -70,7 +74,7 @@ public class AlarmReceiverTiming extends BroadcastReceiver {
                 editor.putLong("curdayflow", curdayflow);
                 logstr += "\ncurdayflow:" + (curdayflow);
                 editor.putLong(String.valueOf(calendar.get(Calendar.DAY_OF_MONTH) + "day"), pref.getLong("curdayflow", 0));
-                logstr += "\n"+String.valueOf(calendar.get(Calendar.DAY_OF_MONTH) + "day") +":"+ (pref.getLong("curdayflow", 0));
+                logstr += "\n" + String.valueOf(calendar.get(Calendar.DAY_OF_MONTH) + "day") + ":" + (pref.getLong("curdayflow", 0));
                 editor.commit();
 
                 //log
@@ -90,9 +94,7 @@ public class AlarmReceiverTiming extends BroadcastReceiver {
             }
 //            Toast.makeText(context, "mobile:" + mobileInfo.isConnected() + "\n" + "wifi:" + wifiInfo.isConnected()      + "\n" + "active:" + activeInfo.getTypeName(), Toast.LENGTH_SHORT).show();
             //Log.d("qiang", "mobile:" + mobileInfo.isConnected() + ",wifi:" + wifiInfo.isConnected() + ",active:" + activeInfo.getTypeName());
-        } else
-
-        {
+        } else {
             Log.d(TAG, "网络没有连接,所以终止定时广播");
         }
     }
