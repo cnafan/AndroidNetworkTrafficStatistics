@@ -39,6 +39,9 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
     private ListPreference RemonthListPreference;
     private SwitchPreference freeSwitchPreference;
     private EditTextPreference freeEditTextPreference;
+    private EditTextPreference alertsflowEditTextPreference;
+
+    //private EditTextPreference blankEditTextPreference;
 
     private void initPreferences() {
         SharedPreferences pref_default = getDefaultSharedPreferences(this);
@@ -50,10 +53,12 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
         RemonthListPreference = (ListPreference) findPreference("remonth");
         freeEditTextPreference = (EditTextPreference) findPreference("freeflow");
         freeSwitchPreference = (SwitchPreference) findPreference("free");
-
+        alertsflowEditTextPreference=(EditTextPreference)findPreference("alertsflow");
+       // blankEditTextPreference=(EditTextPreference)findPreference("blank");
         //CheckEditTextPreference.setSummary(pref_default.getString("check", "0"));
         RemonthListPreference.setSummary(pref_default.getString("remonth", "0"));
         freeEditTextPreference.setSummary(pref_default.getString("freeflow", "0"));
+
     }
 
     LinearLayout root;
@@ -116,6 +121,23 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
                     Intent intent2 = new Intent(this, AlarmManualStart.class);
                     startService(intent2);
                 }
+                break;
+            case "alerts":
+                Snackbar.make(root, "更改已保存", Snackbar.LENGTH_SHORT)
+                        .show();
+                if (pref_default.getBoolean("alerts", false)) {
+                    alertsflowEditTextPreference.setSelectable(true);
+                    alertsflowEditTextPreference.setSummary(pref_default.getString("alertsflow", "0"));
+                }
+                else {
+                    alertsflowEditTextPreference.setSelectable(false);
+                    alertsflowEditTextPreference.setSummary("输入流量预警上限（M)(不可用)");
+                }
+                break;
+            case "alertsflow":
+                Snackbar.make(root, "更改已保存", Snackbar.LENGTH_SHORT)
+                        .show();
+                alertsflowEditTextPreference.setSummary(pref_default.getString("alertsflow", "0"));
                 break;
             case "ShowNotification":
                 Snackbar.make(root, "更改已保存", Snackbar.LENGTH_SHORT)

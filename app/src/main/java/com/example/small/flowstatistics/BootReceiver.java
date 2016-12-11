@@ -24,6 +24,8 @@ public class BootReceiver extends BroadcastReceiver {
             SharedPreferences.Editor editor = context.getSharedPreferences("data", MODE_PRIVATE).edit();
             SharedPreferences pref = context.getSharedPreferences("data", MODE_PRIVATE);
             long curdayflow = pref.getLong("curdayflow", 0);//4
+            editor.putBoolean("isreboot",true);
+            editor.commit();
             new NotificationManagers().showNotificationPrecise(context,curdayflow);
         }
     }

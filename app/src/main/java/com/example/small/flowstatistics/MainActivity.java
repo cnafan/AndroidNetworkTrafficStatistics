@@ -110,7 +110,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     + "\n今日使用流量：" + new Formatdata().longtostring(curdayflow)
                     + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow);
         }
-
         textView = (TextView) findViewById(R.id.main);
         textView.setText(textstr);
     }
@@ -123,13 +122,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         pref_default = getDefaultSharedPreferences(this);
-        editor = getSharedPreferences("data", Context.MODE_PRIVATE).edit();
+        editor = getSharedPreferences("data", MODE_PRIVATE).edit();
         pref = getSharedPreferences("data", MODE_PRIVATE);
 
         boolean isfirstrun = pref.getBoolean("isfirstrun", true);
         if (isfirstrun) {
             Calendar calendar = Calendar.getInstance();
             int curmonth = calendar.get(Calendar.MONTH);
+            editor.putLong("firststartflow", new CalculateTodayFlow().calculate(this));//第一次开启前使用的流量
             editor.putInt("savemonth", curmonth);
             editor.putLong("thisbootflow", 0);//3
             editor.putLong("curdayflow", 0);//4
@@ -141,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //editor.putLong("curfreetimeflow", 0);//当日闲时流量=curfreebehind+curfreefront
             editor.putLong("allfreetimeflow", 0);//闲时流量总量
             editor.putLong("curmonthfreeflow", 0);//当月使用闲时流量
+            editor.putBoolean("isreboot",false);//是否重启过
             editor.commit();
             startService(new Intent(this, AlarmTimingStart.class));
             startService(new Intent(this, AlarmFreeStart.class));
@@ -273,7 +274,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Viewport tempViewport = new Viewport(0, lineChart.getMaximumViewport().height() * 1.4f, 9, 0);//调整y轴,使图标上部有留白:
         lineChart.setCurrentViewport(tempViewport);//left：0//X轴为0   top:chart.getMaximumViewport()//Y轴的最大值right: 9//X轴显示9列 bottom：0//Y轴为0
     }
-
     /*
     private void prepareDataAnimation(int type) {
         if (type == 0) {
@@ -293,7 +293,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         lineChart.setCurrentViewport(tempViewport);//left：0//X轴为0   top:chart.getMaximumViewport()//Y轴的最大值right: 9//X轴显示9列 bottom：0//Y轴为0
     }
 */
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {

@@ -45,6 +45,16 @@ public class AlarmReceiverTiming extends BroadcastReceiver {
         }
         if (activeInfo.isConnected()) {
             if (Objects.equals(activeInfo.getTypeName(), "MOBILE")) {
+                long curmonthflow = pref.getLong("curmonthflow", 0);
+                long remain_liuliang = pref.getLong("remain_liuliang", 0);
+                CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();
+                long curdayflow = ((pref.getBoolean("isreboot", false)) ? calculateTodayFlow.calculate(context) : calculateTodayFlow.calculate(context) - pref.getLong("firststartflow", 0));
+                long allfreetimeflow = new Formatdata().GetNumFromString(pref_default.getString("freeflow", "0") + "M");
+                long curmonthremainflow = pref_default.getBoolean("free", false) ? (remain_liuliang - curmonthflow - curdayflow - allfreetimeflow) : (remain_liuliang - curmonthflow - curdayflow);
+               //alert_notification
+                if (curmonthremainflow < (new Formatdata().GetNumFromString(pref_default.getString("alertsflow", "0")))) {
+                    new NotificationManagers().showNotificationRough(context);
+                }
 
                 long cur_boot_mobiletx = TrafficStats.getMobileTxBytes();
                 long cur_boot_mobilerx = TrafficStats.getMobileRxBytes();
@@ -53,8 +63,6 @@ public class AlarmReceiverTiming extends BroadcastReceiver {
                 //long onedaylastbootflow = pref.getLong("onedaylastbootflow", 0);//5
                 //long onebootlastdayflow = pref.getLong("onebootlastdayflow", 0);//6
 
-                CalculateTodayFlow calculateTodayFlow = new CalculateTodayFlow();
-                long curdayflow = calculateTodayFlow.calculate(context);
                 long freetimeflowstart = pref.getLong("freetimeflowstart", 0);
 
                 Calendar calendar = Calendar.getInstance();

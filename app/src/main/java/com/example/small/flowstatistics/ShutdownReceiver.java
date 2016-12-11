@@ -47,6 +47,7 @@ public class ShutdownReceiver extends BroadcastReceiver {
         onedaylastbootflow = onedaylastbootflow + thisbootflow - onebootlastdayflow;
         editor.putLong("onedaylastbootflow", onedaylastbootflow);
         editor.putLong("onebootlastdayflow", 0);
+        editor.putBoolean("isreboot",true);
         editor.commit();
         Log.d("qiang", "shutdown");
     }

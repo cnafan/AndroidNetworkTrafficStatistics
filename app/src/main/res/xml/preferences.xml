@@ -9,11 +9,6 @@
         android:summary="通知栏常驻通知"
         android:title="显示通知" />
 
-    <SwitchPreference
-        android:defaultValue="false"
-        android:key="log"
-        android:summary="将会产生大量调试记录"
-        android:title="记录日志" />
 
     <SwitchPreference
         android:defaultValue="false"
@@ -52,5 +47,25 @@
         android:key="remonth"
         android:summary="0"
         android:title="每月流量统计起始日期" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="alerts"
+        android:summary="开启后低于自定义值后将发出警告"
+        android:title="开启流量预警"/>
+    <EditTextPreference
+        android:defaultValue="0"
+        android:key="alertsflow"
+        android:inputType="number"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:summary="输入流量预警上限"
+        android:title="流量上限(M)"/>
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="log"
+        android:summary="将会产生大量调试记录"
+        android:title="记录日志" />
 
 </PreferenceScreen>

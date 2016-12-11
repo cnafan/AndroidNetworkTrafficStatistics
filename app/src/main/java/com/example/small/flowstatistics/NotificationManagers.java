@@ -19,8 +19,23 @@ import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
 class NotificationManagers {
 
-    void showNotificationRough() {
+    void showNotificationRough(Context context) {
 
+        String notification_string = "本月所使用的流量已超出警戒值！！！";
+
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        Notification.Builder builder = new Notification.Builder(context);
+        builder.setSmallIcon(R.mipmap.ic_album_black_24dp)
+                .setContentTitle("流量计")
+                .setAutoCancel(true)
+                .setOngoing(true)
+                .setAutoCancel(true)//cancel
+                .setContentText(notification_string);
+        if (Build.VERSION.SDK_INT < 16) {
+            notificationManager.notify(1, builder.getNotification());
+        } else {
+            notificationManager.notify(1, builder.build());
+        }
     }
 
     void showNotificationPrecise(Context context, long curdayflow) {
@@ -55,7 +70,7 @@ class NotificationManagers {
                 Calendar calendar = Calendar.getInstance();
                 int systemTime = calendar.get(Calendar.HOUR_OF_DAY);
                 if (systemTime > 22 || systemTime < 7) {//从23点开始截止到次日7点
-                    notification_string = "本月闲时还剩 " + ((pref.getBoolean("sent", false)) ? new Formatdata().longtostring(allfreetimeflow - curmonthfreeflow - curfreebehind-curfreefront) : "0k") + " 今日已用闲时" + new Formatdata().longtostring(curfreebehind+curfreefront);
+                    notification_string = "本月闲时还剩 " + ((pref.getBoolean("sent", false)) ? new Formatdata().longtostring(allfreetimeflow - curmonthfreeflow - curfreebehind - curfreefront) : "0k") + " 今日已用闲时" + new Formatdata().longtostring(curfreebehind + curfreefront);
 
                 } else {
                     notification_string = "本月流量还剩 " + ((pref.getBoolean("sent", false)) ? new Formatdata().longtostring(remain_liuliang - curmonthflow - curdayflow - allfreetimeflow) : "0k") + " 今日已用" + new Formatdata().longtostring(curdayflow);
