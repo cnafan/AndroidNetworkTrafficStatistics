@@ -28,7 +28,7 @@ class NotificationManagers {
         builder.setSmallIcon(R.mipmap.ic_album_black_24dp)
                 .setContentTitle("流量计")
                 .setAutoCancel(true)
-                .setOngoing(true)
+                .setOngoing(false)
                 .setAutoCancel(true)//cancel
                 .setContentText(notification_string);
         if (Build.VERSION.SDK_INT < 16) {

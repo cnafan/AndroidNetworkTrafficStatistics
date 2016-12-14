@@ -167,8 +167,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
         AddLineChartDate(0);//本月
 
-        eachday = (Button) findViewById(R.id.eachday);
-        eachday.setOnClickListener(this);
+        /*
+        *
+        <Button
+            android:padding="10dp"
+            android:id="@+id/eachday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:text="@string/eachday" />
+        * */
+       // eachday = (Button) findViewById(R.id.eachday);
+       // eachday.setOnClickListener(this);
         eachmonth = (Button) findViewById(R.id.eachmonth);
         eachmonth.setOnClickListener(this);
     }
@@ -301,11 +311,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //prepareDataAnimation(0);
                 //lineChart.startDataAnimation();
                 break;
+            /*
             case R.id.eachday:
                 AddLineChartDate(1);//本日
                 //prepareDataAnimation(1);
                 //lineChart.startDataAnimation();
                 break;
+            */
             case R.id.fab:
                 ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
                 NetworkInfo mobileInfo = manager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);

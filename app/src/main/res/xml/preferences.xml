@@ -59,8 +59,8 @@
         android:inputType="number"
         android:maxLines="1"
         android:singleLine="true"
-        android:summary="输入流量预警上限"
-        android:title="流量上限(M)"/>
+        android:summary="输入流量预警下限(M)"
+        android:title="流量下限(M)"/>
 
     <SwitchPreference
         android:defaultValue="false"

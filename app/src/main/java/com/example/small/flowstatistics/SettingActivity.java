@@ -58,6 +58,7 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
         //CheckEditTextPreference.setSummary(pref_default.getString("check", "0"));
         RemonthListPreference.setSummary(pref_default.getString("remonth", "0"));
         freeEditTextPreference.setSummary(pref_default.getString("freeflow", "0"));
+        alertsflowEditTextPreference.setSummary(pref_default.getString("alertsflow", "0"));
 
     }
 

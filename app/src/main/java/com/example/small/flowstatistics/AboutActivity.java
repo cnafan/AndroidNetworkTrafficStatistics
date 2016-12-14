@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,7 +45,8 @@ public class AboutActivity extends AppCompatActivity {
     protected void initData() {
         mdata = new ArrayList<String>();
         for (int i = 'A'; i < 'z'; i++) {
-            mdata.add("" + (char) i);
+            //mdata.add("" + (char) i);
+            mdata.add("");
         }
     }
 
@@ -75,7 +77,8 @@ public class AboutActivity extends AppCompatActivity {
                 NetworkInfo activeInfo = manager.getActiveNetworkInfo();
                 Snackbar.make(getWindow().getDecorView(), myDevice() + ":" + activeInfo.getTypeName() + "", LENGTH_SHORT).show();
 
-                if (pref.getBoolean("log",false)) {
+                Log.d("qiang","logtest1");
+                if (pref_default.getBoolean("log",false)) {
                     //log
                     AlertDialog.Builder alertDialogLog = new AlertDialog.Builder(AboutActivity.this);
                     String logstr = new FileManager().readLogFile(AboutActivity.this, "log");
@@ -83,6 +86,8 @@ public class AboutActivity extends AppCompatActivity {
                     alertDialogLog.setMessage(logstr);
                     alertDialogLog.setPositiveButton(getString(R.string.ok), null);
                     alertDialogLog.show();
+
+                    Log.d("qiang","logtest2");
                 }
                 //getWindow().getDecorView()
             }

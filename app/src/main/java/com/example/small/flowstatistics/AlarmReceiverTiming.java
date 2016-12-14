@@ -51,9 +51,11 @@ public class AlarmReceiverTiming extends BroadcastReceiver {
                 long curdayflow = ((pref.getBoolean("isreboot", false)) ? calculateTodayFlow.calculate(context) : calculateTodayFlow.calculate(context) - pref.getLong("firststartflow", 0));
                 long allfreetimeflow = new Formatdata().GetNumFromString(pref_default.getString("freeflow", "0") + "M");
                 long curmonthremainflow = pref_default.getBoolean("free", false) ? (remain_liuliang - curmonthflow - curdayflow - allfreetimeflow) : (remain_liuliang - curmonthflow - curdayflow);
-               //alert_notification
-                if (curmonthremainflow < (new Formatdata().GetNumFromString(pref_default.getString("alertsflow", "0")))) {
-                    new NotificationManagers().showNotificationRough(context);
+                //alert_notification
+                if (pref_default.getBoolean("alerts", true)) {
+                    if (curmonthremainflow < (new Formatdata().GetNumFromString(pref_default.getString("alertsflow", "0")+"M"))) {
+                        new NotificationManagers().showNotificationRough(context);
+                    }
                 }
 
                 long cur_boot_mobiletx = TrafficStats.getMobileTxBytes();
