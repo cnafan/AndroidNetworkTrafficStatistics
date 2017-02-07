@@ -1,71 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:key="screen"
     android:layout_height="match_parent">
+    <PreferenceCategory android:title="@string/general">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="ShowNotification"
+            android:summary="通知栏常驻通知"
+            android:title="显示通知" />
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/month_day"
+            android:entryValues="@array/month_day"
+            android:key="remonth"
+            android:summary="0"
+            android:title="每月流量统计起始日期" />
+    </PreferenceCategory>
+    <PreferenceCategory android:key="checkcategory" android:title="@string/check">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="AutomaticCheck"
+            android:summary="每日0点自动发送指令校正流量"
+            android:title="开启自动校正" />
+        <EditTextPreference
+            android:defaultValue="0"
+            android:inputType="number"
+            android:key="check"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:summary="输入不可用流量（M）,系统将忽略此部分流量"
+            android:title="手动校正(M)" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="free"
+            android:summary="统计每日23点至次日7点所使用流量"
+            android:title="开启闲时统计" />
 
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="ShowNotification"
-        android:summary="通知栏常驻通知"
-        android:title="显示通知" />
+        <EditTextPreference
+            android:defaultValue="0"
+            android:inputType="number"
+            android:key="freeflow"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:summary="手动输入闲时流量总量（M）"
+            android:title="闲时流量(M)" />
 
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="alertscategory" android:title="@string/alert">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="alerts"
+            android:summary="开启后低于自定义值后将发出警告"
+            android:title="开启流量预警" />
 
-    <SwitchPreference
-        android:defaultValue="false"
-        android:key="AutomaticCheck"
-        android:summary="每日0点自动发送指令校正流量"
-        android:title="开启自动校正" />
+        <EditTextPreference
+            android:defaultValue="0"
+            android:inputType="number"
+            android:key="alertsflow"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:summary="输入流量预警上限(M)"
+            android:title="流量上限(M)" />
 
-    <EditTextPreference
-        android:defaultValue="0"
-        android:inputType="number"
-        android:key="check"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:summary="输入不可用流量（M）,系统将忽略此部分流量"
-        android:title="手动校正(M)" />
-
-    <SwitchPreference
-        android:defaultValue="false"
-        android:key="free"
-        android:summary="统计每日23点至次日7点所使用流量"
-        android:title="开启闲时统计" />
-
-    <EditTextPreference
-        android:defaultValue="0"
-        android:inputType="number"
-        android:key="freeflow"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:summary="手动输入闲时流量总量（M）"
-        android:title="闲时流量(M)" />
-
-    <ListPreference
-        android:defaultValue="1"
-        android:entries="@array/month_day"
-        android:entryValues="@array/month_day"
-        android:key="remonth"
-        android:summary="0"
-        android:title="每月流量统计起始日期" />
-
-    <SwitchPreference
-        android:defaultValue="false"
-        android:key="alerts"
-        android:summary="开启后低于自定义值后将发出警告"
-        android:title="开启流量预警"/>
-    <EditTextPreference
-        android:defaultValue="0"
-        android:key="alertsflow"
-        android:inputType="number"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:summary="输入流量预警下限(M)"
-        android:title="流量下限(M)"/>
-
-    <SwitchPreference
-        android:defaultValue="false"
-        android:key="log"
-        android:summary="将会产生大量调试记录"
-        android:title="记录日志" />
-
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="log"
+            android:summary="将会产生大量调试记录"
+            android:title="记录日志" />
+    </PreferenceCategory>
 </PreferenceScreen>

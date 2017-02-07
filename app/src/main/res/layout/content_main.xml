@@ -1,50 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.small.flowstatistics.MainActivity"
     tools:showIn="@layout/activity_main">
 
-
-    <LinearLayout
-        android:id="@+id/buttonPanel"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal">
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingTop="@dimen/activity_vertical_margin">
 
-        <Button
-            android:id="@+id/eachmonth"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/buttonPanel"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:elevation="0dp"
-            android:padding="10dp"
-            android:text="@string/eachmonth" />
+            android:gravity="left"
+            android:orientation="horizontal">
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/eachmonth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:elevation="0dp"
+                android:padding="10dp"
+                android:text="@string/eachmonth"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp" />
 
-    <lecho.lib.hellocharts.view.LineChartView
-        android:id="@+id/linechart"
-        android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:layout_below="@+id/buttonPanel"
-        android:padding="10dp" />
+        </LinearLayout>
 
-    <TextView
-        android:id="@+id/main"
-        android:layout_below="@id/linechart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:text="Hello World!" />
+        <lecho.lib.hellocharts.view.LineChartView
 
+            android:id="@+id/linechart"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:layout_below="@+id/buttonPanel"
+            android:padding="10dp" />
 
-</RelativeLayout>
+        <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/linechart"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="16dp"
+            android:clickable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:padding="12dp"
+            android:stateListAnimator="@drawable/touch_raise"
+            card_view:cardCornerRadius="5dp"
+            card_view:cardPreventCornerOverlap="true"
+            card_view:cardUseCompatPadding="true"
+            card_view:contentPadding="10dp"
+            tools:targetApi="lollipop">
+
+            <TextView
+                android:id="@+id/main"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hello World!" />
+
+        </android.support.v7.widget.CardView>
+    </RelativeLayout>
+</ScrollView>

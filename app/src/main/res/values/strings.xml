@@ -9,23 +9,14 @@
     <string name="opensourcetitle">感谢</string>
     <string name="updatelogtitle">更新日志</string>
     <string name="opensource">感谢开源世界，让我们能在巨人的肩膀上看的更远</string>
-    <string-array name="opensourceproject">
-        <item>\t\t\t·lecho/hellocharts-android</item>
-        <item>\t\t\t·com.android.support.design</item>
-    </string-array>
-    <string-array name="updatelog">
-        <item>1.0.0\n\t\t\t1.新增闲时统计功能\n\t\t\t2.新增通知管理</item>
-        <item>2.0.0\n\t\t\t1.新增可视化图表\n\t\t\t2.修复已知问题</item>
-        <item>2.1.0\n\t\t\t1.删除无用权限\n\t\t\t2.重绘图标</item>
-        <item>2.1.1\n\t\t\t1.适配Nougat</item>
-        <item>3.1.3\n\t\t\t1.扩大正则表达式适用范围\n\t\t\t2.调节后台数据刷新频率，显著降低耗电量\n\t\t\t3.新增流量上限警戒通知</item>
-    </string-array>
 
-    <string-array name="list_preference_entries">
-        <item>Entry 1</item>
-        <item>Entry 2</item>
-        <item>Entry 3</item>
-    </string-array>
+    <string name="opensource_item">
+        ·lecho/hellocharts-android\n·com.android.support.design
+    </string>
+    <string name="updatetext">
+        1.0.0\n\t\t\t1.新增闲时统计功能\n\t\t\t2.新增通知管理\n2.0.0\n\t\t\t1.新增可视化图表\n\t\t\t2.修复已知问题\n2.1.0\n\t\t\t1.删除无用权限\n\t\t\t2.重绘图标\n2.1.1\n\t\t\t1.适配Nougat\n3.1.3\n\t\t\t1.扩大正则表达式适用范围\n\t\t\t2.调节后台数据刷新频率，显著降低耗电量\n\t\t\t3.新增流量上限警戒通知
+    </string>
+
 
     <string-array name="month_day">
         <item>1</item>
@@ -78,4 +69,7 @@
     <string name="help_message">--点击查询按钮是请务必在开启数据且关闭wifi后\n--使用校正功能后请点击首页查询按钮导入设置"</string>
     <string name="close_sms_grant">接受短信权限已关闭</string>
     <string name="refresh">刷新</string>
+    <string name="check">校正</string>
+    <string name="alert">预警</string>
+    <string name="general">通用</string>
 </resources>

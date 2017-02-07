@@ -13,6 +13,10 @@ import static com.example.small.flowstatistics.MainActivity.TAG;
  */
 
 class CalculateTodayFlow {
+    long calculate_file(Context context) {
+        return 0;
+    }
+
     long calculate(Context context) {
         SharedPreferences.Editor editor = context.getSharedPreferences("data", MODE_PRIVATE).edit();
         SharedPreferences pref = context.getSharedPreferences("data", MODE_PRIVATE);

@@ -15,11 +15,13 @@ import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.TrafficStats;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -34,7 +36,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -57,13 +58,15 @@ import static android.media.AudioManager.STREAM_RING;
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, SMSBroadcastReceiver.Interaction {
-
+    //Snackbar.make(getWindow().getDecorView(),,Snackbar.LENGTH_SHORT).show();
     private int volumn = 0;
     public AudioManager audio;
     public int mode;
 
+    public CoordinatorLayout coordinatorLayout;
     public Button eachmonth;
     public Button eachday;
+    public Toolbar toolbar;
     public TextView textView;
     private ProgressDialog progressDialog;
     public FloatingActionButton fab;
@@ -84,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         long curmonthflow = pref.getLong("curmonthflow", 0);
         long all_liuliang = pref.getLong("all_liuliang", 0);
         long remain_liuliang = pref.getLong("remain_liuliang", 0);
-        long curdayflow = pref.getLong("curdayflow", 0);
+        long curdayflow = (pref.getBoolean("reboot", false)) ? pref.getLong("curdayflow", 0) : 0;
         long lastmonthflow = pref.getLong("lastmonthflow", 0);
         long curfreetimeflow = pref.getLong("curfreetimeflow", 0);
         long curfreefront = pref.getLong("curfreefront", 0);
@@ -100,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     + "\n本月还剩流量(含闲时)：" + ((pref.getBoolean("sent", false)) ? new Formatdata().longtostring(remain_liuliang - curmonthflow - curdayflow) : "0K")
                     + "\n本月可用闲时流量：" + new Formatdata().longtostring(allfreetimeflow)
                     + "\n今日闲时使用流量：" + new Formatdata().longtostring(curfreetimeflow)
-                    + "\n本月还剩流量(不含闲时)：" + new Formatdata().longtostring(remain_liuliang - curmonthflow- curdayflow - allfreetimeflow)
+                    + "\n本月还剩流量(不含闲时)：" + new Formatdata().longtostring(remain_liuliang - curmonthflow - curdayflow - allfreetimeflow)
                     + "\n今日使用流量(不含闲时)：" + new Formatdata().longtostring(curdayflow - curfreebehind - curfreefront)
                     + "\n上个月使用流量：" + new Formatdata().longtostring(lastmonthflow);
         } else {
@@ -119,8 +122,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         pref_default = getDefaultSharedPreferences(this);
         editor = getSharedPreferences("data", MODE_PRIVATE).edit();
         pref = getSharedPreferences("data", MODE_PRIVATE);
@@ -135,19 +140,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             editor.putLong("curdayflow", 0);//4
             editor.putLong("onedaylastbootflow", 0);//一日内上次开机使用的流量 5
             editor.putLong("onebootlastdayflow", 0);//一次开机前一天使用的流量 6
-            editor.putBoolean("isfirstrun", false);
             editor.putLong("curmonthflow", 0);//7
             editor.putLong("lastmonthflow", 0);
             //editor.putLong("curfreetimeflow", 0);//当日闲时流量=curfreebehind+curfreefront
             editor.putLong("allfreetimeflow", 0);//闲时流量总量
             editor.putLong("curmonthfreeflow", 0);//当月使用闲时流量
-            editor.putBoolean("isreboot",false);//是否重启过
+            editor.putBoolean("isreboot", false);//是否重启过
             editor.commit();
             startService(new Intent(this, AlarmTimingStart.class));
             startService(new Intent(this, AlarmFreeStart.class));
             startService(new Intent(this, AlarmManualStart.class));
-
             startActivity(new Intent(MainActivity.this, SettingActivity.class));
+            if (pref_default.getBoolean("isfirstrun", true)) {
+                String tips_string = "请点击右下角按钮从运营商查询流量信息";
+                AlertDialog.Builder tips = new AlertDialog.Builder(this);
+                tips.setMessage(tips_string)
+                        .setTitle("小提示")
+                        .setPositiveButton("好的", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                editor.putBoolean("isfirstrun", false);
+                                editor.commit();
+
+                            }
+                        });
+                tips.show();
+            }
         }
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
@@ -166,9 +184,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         AddLineChartDate(0);//本月
-
         /*
-        *
         <Button
             android:padding="10dp"
             android:id="@+id/eachday"
@@ -177,8 +193,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             android:background="@android:color/transparent"
             android:text="@string/eachday" />
         * */
-       // eachday = (Button) findViewById(R.id.eachday);
-       // eachday.setOnClickListener(this);
+        // eachday = (Button) findViewById(R.id.eachday);
+        // eachday.setOnClickListener(this);
         eachmonth = (Button) findViewById(R.id.eachmonth);
         eachmonth.setOnClickListener(this);
     }
@@ -197,6 +213,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     LineChartData chartData;
 
     private void AddLineChartDate(int type) {
+
+        Calendar calendar = Calendar.getInstance();
+        int curday = calendar.get(Calendar.DAY_OF_MONTH);
+
         int numberOfPoints;
         ArrayList<AxisValue> axisValuesY = new ArrayList<AxisValue>();
         ArrayList<AxisValue> axisValuesX = new ArrayList<AxisValue>();
@@ -214,14 +234,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 values.clear();
                 axisValuesY.clear();
                 axisValuesX.clear();
-                for (int j = 0; j < numberOfPoints; ++j) {
-                    float yvalue = new Formatdata().longtofloat(pref.getLong(j + 1 + "day", 0));
-                    if (j == 30)
-                        yvalue = 0.01f;
+                int j = 0;
+
+                Log.d("MainActivity", "curday:" + curday);
+                while (j < numberOfPoints) {
+                    j++;
+                    float yvalue;
+                    if (j == curday) {
+                        long cur_boot_mobiletx = TrafficStats.getMobileTxBytes();
+                        long cur_boot_mobilerx = TrafficStats.getMobileRxBytes();
+                        long thisbootflow = cur_boot_mobilerx + cur_boot_mobiletx;//4
+                        //yvalue = (float)(new CalculateTodayFlow().calculate(this));
+                        yvalue = (new Formatdata().longtofloat(thisbootflow));
+                        Log.d("MainActivity", "yvalue:" + yvalue);
+                    } else {
+                        yvalue = new Formatdata().longtofloat(pref.getLong(j + "day", 0));
+                    }
                     values.add(new PointValue(j, yvalue));
-                    Log.d(TAG, "pointvalue:" + (j + 1) + "," + yvalue);
+                    Log.d(TAG, "pointvalue:" + (j) + "," + yvalue);
                     //axisValuesY.add(new AxisValue(j * 10 * (i + 1)).setLabel(j + ""));//添加Y轴显示的刻度值
-                    axisValuesX.add(new AxisValue(j).setLabel(j + 1 + "日"));//添加X轴显示的刻度值
+                    axisValuesX.add(new AxisValue(j).setLabel(j + "日"));//添加X轴显示的刻度值
                 }
                 //Calendar calendar = Calendar.getInstance();
                 //int curday = calendar.get(Calendar.DAY_OF_MONTH);
@@ -284,6 +316,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Viewport tempViewport = new Viewport(0, lineChart.getMaximumViewport().height() * 1.4f, 9, 0);//调整y轴,使图标上部有留白:
         lineChart.setCurrentViewport(tempViewport);//left：0//X轴为0   top:chart.getMaximumViewport()//Y轴的最大值right: 9//X轴显示9列 bottom：0//Y轴为0
     }
+
     /*
     private void prepareDataAnimation(int type) {
         if (type == 0) {
@@ -325,7 +358,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 NetworkInfo activeInfo = manager.getActiveNetworkInfo();
                 if (activeInfo == null) {
                     Log.d("qiang", "网络没有连接");
-                    Toast.makeText(this, getString(R.string.toast_search), Toast.LENGTH_SHORT).show();
+                    Snackbar.make(coordinatorLayout, getString(R.string.toast_search), Snackbar.LENGTH_LONG).show();
                     return;
                 }
                 if (activeInfo.isConnected()) {
@@ -354,7 +387,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             sendmessage.Sendmessages();
                             //静音
                             sendmessage.silent();
-                            Snackbar.make(v, getString(R.string.sent), Snackbar.LENGTH_LONG).setAction("", null).show();
+                            Snackbar.make(v, getString(R.string.sent), Snackbar.LENGTH_SHORT).setAction("", null).show();
                             Log.d("qiang", "发送成功");
                         }
                         IntentFilter intentFilter = new IntentFilter();
@@ -363,10 +396,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         registerReceiver(dianLiangBR, intentFilter);
                         dianLiangBR.setInteractionListener(MainActivity.this);
                     } else {
-                        Toast.makeText(this, getString(R.string.toast_search), Toast.LENGTH_SHORT).show();
+                        Snackbar.make(v, getString(R.string.toast_search), Snackbar.LENGTH_LONG).show();
                     }
                 } else {
-                    Toast.makeText(this, getString(R.string.toast_search), Toast.LENGTH_SHORT).show();
+                    Snackbar.make(v, getString(R.string.toast_search), Snackbar.LENGTH_LONG).show();
                 }
                 break;
             default:
@@ -393,8 +426,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Log.d("qiang", "发送成功");
                 } else {
                     // Permission Denied
-                    Toast.makeText(MainActivity.this, getString(R.string.close_sms_grant), Toast.LENGTH_SHORT)
-                            .show();
+                    Snackbar.make(getWindow().getDecorView(), getString(R.string.close_sms_grant), Snackbar.LENGTH_SHORT).show();
                     Log.d("qiang", "接受短信权限已关闭");
                 }
                 break;
@@ -481,7 +513,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             long todayflow = calculateTodayFlow.calculate(context);
             new NotificationManagers().showNotificationPrecise(context, todayflow);
         } else {
-            Toast.makeText(this, getString(R.string.inquery_failure), Toast.LENGTH_LONG).show();
+            Snackbar.make(coordinatorLayout, getString(R.string.inquery_failure), Snackbar.LENGTH_SHORT).show();
         }
 
         long remain_liuliang = pref.getLong("remain_liuliang", 0);

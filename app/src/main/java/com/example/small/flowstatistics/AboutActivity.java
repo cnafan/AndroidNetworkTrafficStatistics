@@ -11,14 +11,12 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -26,6 +24,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 import static android.support.design.widget.Snackbar.LENGTH_SHORT;
 
 public class AboutActivity extends AppCompatActivity {
@@ -55,7 +54,7 @@ public class AboutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
         initData();
-
+        pref_default = getDefaultSharedPreferences(this);
         editor = getSharedPreferences("data", Context.MODE_PRIVATE).edit();
         pref = getSharedPreferences("data", MODE_PRIVATE);
 
@@ -77,7 +76,7 @@ public class AboutActivity extends AppCompatActivity {
                 NetworkInfo activeInfo = manager.getActiveNetworkInfo();
                 Snackbar.make(getWindow().getDecorView(), myDevice() + ":" + activeInfo.getTypeName() + "", LENGTH_SHORT).show();
 
-                Log.d("qiang","logtest1");
+                //Log.d("qiang","logtest1");
                 if (pref_default.getBoolean("log",false)) {
                     //log
                     AlertDialog.Builder alertDialogLog = new AlertDialog.Builder(AboutActivity.this);
@@ -92,6 +91,7 @@ public class AboutActivity extends AppCompatActivity {
                 //getWindow().getDecorView()
             }
         });
+        /*
         listviewOpensource = (ListView) findViewById(R.id.opensourceproject);   //组织数据源
         ArrayAdapter<CharSequence> listviewOpensourceAA = ArrayAdapter.createFromResource(this, R.array.opensourceproject, R.layout.opensource_item);
         listviewOpensource.setAdapter(listviewOpensourceAA);
@@ -100,16 +100,17 @@ public class AboutActivity extends AppCompatActivity {
         ArrayAdapter<CharSequence> listviewUpdatelogAA = ArrayAdapter.createFromResource(this, R.array.updatelog, R.layout.opensource_item);
         listviewUpdatelog.setAdapter(listviewUpdatelogAA);
 
+*/
         textViewCurVersion = (TextView) findViewById(R.id.curversion);
         textViewCurVersion.setText("当前版本:" + getAPPVersion());
 
-        recyclerview = (RecyclerView) findViewById(R.id.recyclerview);
+        //recyclerview = (RecyclerView) findViewById(R.id.recyclerview);
 //        recyclerview.setLayoutManager(new GridLayoutManager(this, 3));
 //        recyclerview.setLayoutManager(new LinearLayoutManager(this,
 //                LinearLayoutManager.VERTICAL, false));
-        recyclerview.setLayoutManager(new LinearLayoutManager(this));
+        //recyclerview.setLayoutManager(new LinearLayoutManager(this));
         //recyclerview.setItemAnimator(new DefaultItemAnimator()); //即使不设置,默认也是这个动画
-        recyclerview.setAdapter(new recyclerAdapter());
+        //recyclerview.setAdapter(new recyclerAdapter());
 
     }
 

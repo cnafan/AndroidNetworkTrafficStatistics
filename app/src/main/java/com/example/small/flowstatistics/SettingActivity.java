@@ -11,6 +11,7 @@ import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
 import android.support.design.widget.Snackbar;
@@ -40,7 +41,7 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
     private SwitchPreference freeSwitchPreference;
     private EditTextPreference freeEditTextPreference;
     private EditTextPreference alertsflowEditTextPreference;
-
+    private SwitchPreference alertSwitchPreference;
     //private EditTextPreference blankEditTextPreference;
 
     private void initPreferences() {
@@ -51,14 +52,22 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
         AutomaticCheckSwitchPreference = (SwitchPreference) findPreference("AutomaticCheck");
         LogSwitchPreference = (SwitchPreference) findPreference("log");
         RemonthListPreference = (ListPreference) findPreference("remonth");
-        freeEditTextPreference = (EditTextPreference) findPreference("freeflow");
+
         freeSwitchPreference = (SwitchPreference) findPreference("free");
-        alertsflowEditTextPreference=(EditTextPreference)findPreference("alertsflow");
-       // blankEditTextPreference=(EditTextPreference)findPreference("blank");
+        freeEditTextPreference = (EditTextPreference) findPreference("freeflow");
+        freeEditTextPreference.setSummary(pref_default.getString("freeflow", "0"));
+        if (!pref_default.getBoolean("free", false)) {
+            ((PreferenceCategory) findPreference("checkcategory")).removePreference(findPreference("freeflow"));
+        }
+        alertSwitchPreference = (SwitchPreference) findPreference("alert");
+        alertsflowEditTextPreference = (EditTextPreference) findPreference("alertsflow");
+        alertsflowEditTextPreference.setSummary(pref_default.getString("alertsflow", "0"));
+        if (!pref_default.getBoolean("alerts", false)) {
+            ((PreferenceCategory) findPreference("alertscategory")).removePreference(findPreference("alertsflow"));
+        }
+        // blankEditTextPreference=(EditTextPreference)findPreference("blank");
         //CheckEditTextPreference.setSummary(pref_default.getString("check", "0"));
         RemonthListPreference.setSummary(pref_default.getString("remonth", "0"));
-        freeEditTextPreference.setSummary(pref_default.getString("freeflow", "0"));
-        alertsflowEditTextPreference.setSummary(pref_default.getString("alertsflow", "0"));
 
     }
 
@@ -127,12 +136,12 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
                 Snackbar.make(root, "更改已保存", Snackbar.LENGTH_SHORT)
                         .show();
                 if (pref_default.getBoolean("alerts", false)) {
+
+                    ((PreferenceCategory) findPreference("alertscategory")).addPreference(alertsflowEditTextPreference);
                     alertsflowEditTextPreference.setSelectable(true);
                     alertsflowEditTextPreference.setSummary(pref_default.getString("alertsflow", "0"));
-                }
-                else {
-                    alertsflowEditTextPreference.setSelectable(false);
-                    alertsflowEditTextPreference.setSummary("输入流量预警上限（M)(不可用)");
+                } else {
+                    ((PreferenceCategory) findPreference("alertscategory")).removePreference(findPreference("alertsflow"));
                 }
                 break;
             case "alertsflow":
@@ -189,11 +198,11 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
                         .show();
                 if (pref_default.getBoolean("free", false)) {
                     startService(new Intent(this, AlarmFreeStart.class));
+                    ((PreferenceCategory) findPreference("checkcategory")).addPreference(freeEditTextPreference);
                     freeEditTextPreference.setSelectable(true);
                     freeEditTextPreference.setSummary(pref_default.getString("freeflow", "0"));
                 } else {
-                    freeEditTextPreference.setSummary("手动输入闲时流量总量（M)(不可用)");
-                    freeEditTextPreference.setSelectable(false);
+                    ((PreferenceCategory) findPreference("checkcategory")).removePreference(findPreference("freeflow"));
                 }
                 break;
             case "freeflow":
