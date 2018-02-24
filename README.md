@@ -1,7 +1,7 @@
 # AndroidNetworkTrafficStatistics  
 ![](https://img.shields.io/github/release/sikuquanshu123/AndroidNetworkTrafficStatistics.svg)  
 
-[官方主页](http://qiangge.me/articles/2015/05/21/android-network-traffic-statistics.html) |  
+[官方主页](http://qiangge.me/articles/2016/05/21/android-network-traffic-statistics.html) |  
 
 ## 主要功能  
 + 实现每月剩余流量的计算，并提供校正功能
