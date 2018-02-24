@@ -1,11 +1,15 @@
 # AndroidNetworkTrafficStatistics  
-![](https://img.shields.io/github/release/sikuquanshu123/AndroidNetworkTrafficStatistics.svg)  
+![](https://img.shields.io/github/release/sikuquanshu123/AndroidNetworkTrafficStatistics.svg)  
 
-## 主要功能  
+[官方主页](http://qiangge.me/articles/2015/05/21/android-network-traffic-statistics.html) |  
+
+## 主要功能  
 + 实现每月剩余流量的计算，并提供校正功能
 + 统计每日使用的流量  
+
 ## 实现细节  
 每月剩余流量的查询是通过发送10086的查询短信，并利用其回执短信使用正则表达式提取数据。而每日流量的统计则是通过TrafficStats类提供的静态方法读取数据，不过它提供的数据是统计的手机在一次开机中所使用。所以要考虑关机之前的数据保存。  
+
 ## Change Log  
 ### v0.1  
 - 新增闲时统计功能  
